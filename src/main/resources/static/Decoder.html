@@ -5,6 +5,7 @@
     <title>Decoder</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js" integrity="sha256-gJWdmuCRBovJMD9D/TVdo4TIK8u5Sti11764sZT1DhI=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+	<script src="assets/scripts/html2canvas.min.js"></script>
 
     <style>
         table {
@@ -22,6 +23,8 @@
         h1 {
             font-size: 64px;
             text-align: center;
+			margin-bottom: 0px;
+			margin-top: 0px;
         }
         div {
             width: 696px;
@@ -32,83 +35,119 @@
         thead {
             display: none;
         }
+		
+		.border {
+			border: 1px solid black;
+		}
+		
     </style>
 </head>
 <body>
-Title:&nbsp;<input id="title"/><br><br>
-Phrase to decode:<br><textarea id="input" style="width: 50%; height: 25%;"></textarea><br><br><br>
-<div id="output"></div><br><br>
-<button onclick="">PDF</button>
-<script>
-
-    var columns = 15;
-	var footer = '1=A, 2=B, 3=C, 4=D, 5=E, 6=F, 7=G, 8=H, 9=I, 10=J, 11=K, 12=L, 13=M, 14=N, 15=O, 16=P, 17=Q, 18=R, 19=S, 20=T, 21=U, 22=V, 23=W, 24=X, 25=Y, 26=Z';
-	jQuery('#input').change(function() {
-		var aInt = 'A'.charCodeAt(0);
-		var zInt = 'Z'.charCodeAt(0);
-		var phrase = $('#input').val();
-		var nextIndexOfSpace = phrase.indexOf(' ');
-	    var newLineIdx = 0;
-		var coded = [];
-		for (var c = 0; c < phrase.length; c++) {
-			var x = phrase.charAt(c);
-			var j = x.toUpperCase().charCodeAt(0);
-			var k = '__';
-			var val = j - aInt + 1;
-			if (j < aInt || j > zInt) {
-				k = x;
-				if (j == 32) {
-				    val = '&nbsp;';
+	<table>
+		<tr>
+			<td class="border"><div id="output"></div></td>
+			<td>
+				Title:&nbsp;<input id="title"/><br><br>
+				Phrase to decode:<br><textarea id="input" style="width: 100%; height: 25%;"></textarea>
+				<button id="pdfPrint">Print PDF</button>
+			</td>
+		</tr>
+	</table>
+	<script>
+		var columns = 15;
+		var footer = '1=A, 2=B, 3=C, 4=D, 5=E, 6=F, 7=G, 8=H, 9=I, 10=J, 11=K, 12=L, 13=M, 14=N, 15=O, 16=P, 17=Q, 18=R, 19=S, 20=T, 21=U, 22=V, 23=W, 24=X, 25=Y, 26=Z';
+		jQuery('#input').change(function() {
+			var aInt = 'A'.charCodeAt(0);
+			var zInt = 'Z'.charCodeAt(0);
+			var phrase = $('#input').val();
+			var nextIndexOfSpace = phrase.indexOf(' ');
+			var newLineIdx = 0;
+			var coded = [];
+			for (var c = 0; c < phrase.length; c++) {
+				var x = phrase.charAt(c);
+				var j = x.toUpperCase().charCodeAt(0);
+				var k = '__';
+				var val = j - aInt + 1;
+				if (j < aInt || j > zInt) {
+					k = x;
+					if (j == 32) {
+						val = '&nbsp;';
+					}
+					else {
+						val = '';
+					}
 				}
-				else {
-				    val = '';
+
+				coded[coded.length] = [k , val];
+			}
+			var out='<h1>'+$('#title').val()+'</h1>';
+			var td1 = '<tr>';
+			var td2 = '<tr>';
+			for (var idx = 0; idx < coded.length; idx++) {
+				//space found, find next space
+				if (coded[idx][1] == '&nbsp;' || idx == (coded.length - 1)) {
+					nextIndexOfSpace = phrase.indexOf(' ', nextIndexOfSpace + 1);
+
+					//if next space is beyond the char max, go to new line
+					if (nextIndexOfSpace - newLineIdx > columns || nextIndexOfSpace == -1) {
+						out += '<table align="center">';
+						out += createHeader(coded, newLineIdx, idx);
+						out += createLine(coded, 0, newLineIdx, idx);
+						out += createLine(coded, 1, newLineIdx, idx);
+						out += '</table>';
+						newLineIdx = idx + 1;
+					}
 				}
 			}
+			out += '<table  align="center">';
+			out += createLine(coded, 0, newLineIdx, coded.length);
+			out += createLine(coded, 1, newLineIdx, coded.length);
+			out += '</table><br><div id="key">'+footer+'</div>';
+			jQuery('#output').html(out);
+		});
 
-			coded[coded.length] = [k , val];
+		function createHeader(arr, start, end) {
+			var tr = '<thead class="bypassme">';
+			for (var idx = start; idx < end; idx++) {
+				tr += '<td>'+idx+'</td>';
+			}
+			tr += '</thead>';
+			return tr;
 		}
-        var out='<h1>'+$('#title').val()+'</h1>';
-        var td1 = '<tr>';
-        var td2 = '<tr>';
-        for (var idx = 0; idx < coded.length; idx++) {
-            //space found, find next space
-            if (coded[idx][1] == '&nbsp;' || idx == (coded.length - 1)) {
-                nextIndexOfSpace = phrase.indexOf(' ', nextIndexOfSpace + 1);
+		function createLine(arr, row, start, end) {
+		   var tr = '';
+		   for (var idx = start; idx < end; idx++) {
+				tr += '<td>'+arr[idx][row]+'</td>';
+		   }
+		   
+		   tr = '<tr>' + tr + '</tr>';
+		   return tr;
+		}
+		
+		jQuery('#pdfPrint').click(
+		function () {
+			const filename  = 'Decoder.pdf';
 
-                //if next space is beyond the char max, go to new line
-                if (nextIndexOfSpace - newLineIdx > columns || nextIndexOfSpace == -1) {
-                    out += '<table align="center">';
-                    out += createHeader(coded, newLineIdx, idx);
-                    out += createLine(coded, 0, newLineIdx, idx);
-                    out += createLine(coded, 1, newLineIdx, idx);
-                    out += '</table>';
-                    newLineIdx = idx + 1;
-                }
-            }
-        }
-        out += '<table  align="center">';
-        out += createLine(coded, 0, newLineIdx, coded.length);
-        out += createLine(coded, 1, newLineIdx, coded.length);
-        out += '</table><br><div id="key">'+footer+'</div>';
-		jQuery('#output').html(out);
+			html2canvas(document.querySelector('#output')).then(canvas => {
+				let pdf = new jsPDF('p', 'px', 'letter');
+				pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 400, 600);
+				pdf.save(filename);
+			});
+		});
 
-    function createHeader(arr, start, end) {
-        var tr = '<thead class="bypassme">';
-        for (var idx = start; idx < end; idx++) {
-            tr += '<td>'+idx+'</td>';
-        }
-        tr += '</thead>';
-        return tr;
-    }
-	function createLine(arr, row, start, end) {
-	   var tr = '';
-	   for (var idx = start; idx < end; idx++) {
-            tr += '<td>'+arr[idx][row]+'</td>';
-	   }
-	   
-	   tr = '<tr>' + tr + '</tr>';
-	   return tr;
-	}
-</script>
+		// Variant
+		// This one lets you improve the PDF sharpness by scaling up the HTML node tree to render as an image before getting pasted on the PDF.
+		function print(quality = 1) {
+			const filename  = 'Decoder.pdf';
+
+			html2canvas(document.querySelector('#output'), 
+									{scale: quality}
+							 ).then(canvas => {
+				let pdf = new jsPDF('p', 'in', 'letter');
+				pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 8.5, 11);
+				pdf.save(filename);
+			});
+		}
+	</script>
 </body>
 </html>
