@@ -31,7 +31,7 @@
 			padding-bottom: 25px;
         }
         div {
-            width: 720px;
+            width: 744px;
             font-size: 43.5px;
             text-align: center;
         }
@@ -62,14 +62,14 @@
 			<td class="border"><div id="output"></div></td>
 			<td>
 				Title:&nbsp;<input id="title"/><br><br>
-				Phrase to decode:<br><textarea id="input" maxlength="50"></textarea>
+				Phrase to decode:<br><textarea id="input" maxlength="60"></textarea>
 				<button id="pdfPrint">Print PDF</button>
 			</td>
 		</tr>
 	</table>
 	<script>
 		var columns = 15;
-		var footer = '1=A, 2=B, 3=C, 4=D, 5=E, 6=F, 7=G, 8=H, 9=I, 10=J, 11=K, 12=L, 13=M, 14=N, 15=O, 16=P, 17=Q, 18=R, 19=S, 20=T, 21=U, 22=V, 23=W, 24=X, 25=Y, 26=Z';
+		var footer = '1=A 2=B 3=C 4=D 5=E 6=F 7=G 8=H 9=I 10=J 11=K 12=L 13=M 14=N 15=O 16=P 17=Q 18=R 19=S 20=T 21=U 22=V 23=W 24=X 25=Y 26=Z';
 		jQuery('#input').change(function() {
 			var aInt = 'A'.charCodeAt(0);
 			var zInt = 'Z'.charCodeAt(0);
@@ -92,7 +92,7 @@
 					}
 				}
 
-				coded[coded.length] = [k , val];
+				coded[coded.length] = [k,  val];
 			}
 			var out='<div class="padPage"><h1>'+$('#title').val()+'</h1>';
 			var td1 = '<tr>';
