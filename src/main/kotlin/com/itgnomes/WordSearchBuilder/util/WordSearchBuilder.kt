@@ -1,3 +1,8 @@
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
+import kotlin.random.Random
+
 /**wordsearch.kt
  * A small java program that works as a basic word search generator.
  * Takes in words to be 'hidden' creates and fills array with the words
@@ -5,18 +10,19 @@
  *
  * @author JChase.
  **/
-class wordSearch() {
-    var width: Int
-    var length: Int
-    var wordCount: Int
-    var words = arrayListOf()
+@RestController
+class WordSearchBuilder() {
+    var width: Int = 0
+    var length: Int = 0
+    var wordCount: Int = 0
+    var words = arrayListOf<String>()
     var badWords = listOf("arse", "ass", "asshole", "bastard", "bitch", "bollocks", "bugger", "crap", "cunt", "damn", "effing", "frigger", "fuck", "hell", "holy shit", "horseshit", "motherfucker", "nigga", "nigger", "prick", "shit", "slut", "twat", "whore")
-    var positions: intArray
-    var search = arrayOf<Array<Char>>()
-    var input: String
-    var toUpperCase: Boolean
+    var positions = arrayListOf<Int>()
+    var search = arrayListOf<Array<Char>>()
+    var input: String = ""
+    var toUpperCase: Boolean = false
     /** counter for errors **/
-    var errorCount: Int
+    var errorCount: Int = 0
 
     /**
      * Prints the finished word search and related information
@@ -37,32 +43,86 @@ class wordSearch() {
     /**
      * Prints output to html page and saves.
      */
-    fun printHtml() {
+    fun printHtml():String {
+        var response = ""
 
+        val tableWidth = 20.4 * width
+        var outputHtml: String? = ""
+        val htmlStart = """<html lang="en">
+                |<head>
+                |   <title>WordSearch</title>
+                |   <style>
+                |       tr {text-align: center; }
+                |       .myTd {text-align: left; }
+                |   </style>
+                |</head>
+                |<body>
+                |   <p style="text-align: center; width:  $tableWidth px; font-size: 3em;">Word Search</p>
+                |   <table style="width: $tableWidth px">""".trimMargin()
+        val htmlEnd = """   </table><br/><br/><br/>
+                |   <p style="text-align: center; width: $tableWidth;">Did you find any other words? Write them below</p><br/><br/><br/><br/><br/><br/>
+                |</body>
+                |</html>""".trimMargin()
+        // generate crossword grid
+        // generate crossword grid
+        outputHtml += htmlStart
+
+        for (i in 0 until width) {
+            outputHtml += """|          <tr>""".trimMargin()
+            for (ind in 0 until length) {
+                outputHtml += """|              <td>$search[i][ind].toString()</td>""".trimMargin()
+            }
+            outputHtml += """|          </tr>""".trimMargin()
+        }
+
+        // generate word list
+        // generate word list
+        outputHtml += """</table><br/><br/>
+                |<table style="width: $tableWidth px"><tr>""".trimMargin()
+        outputHtml += "<td style=\"width: $tableWidth/10 px\"></td>"
+        for (i in 0 until wordCount) {
+            if (i % (wordCount / 3) == 0) {
+                outputHtml += "<td class=\"myTd\">"
+            }
+            outputHtml += words[i] + "<br/>"
+            if (i % (wordCount / 3) == wordCount / 3 - 1 || i == wordCount - 1) {
+                outputHtml += "</td>"
+            }
+        }
+        outputHtml += "<td style=\"width: $tableWidth/10 px\"></td>"
+        outputHtml += "</tr>$htmlEnd"
+
+        return response
     }
 
     /**
      * Creates the wordsearch by calling other methods
      */
-    fun run() {
+    @GetMapping("/GetWordSearch")
+    fun run(@RequestParam(value = "width") width: String, @RequestParam(value = "length") length: String,
+            @RequestParam(value = "words") words: String): String {
         println("""Welcome to the word search generator
             |This simple java program will create a word search based on words you choose""".trimMargin())
-        takeInput()
+        this.width = width?.toInt()
+        this.length = length?.toInt()
+        this.words = words?.split(",") as ArrayList<String>
+        this.wordCount = this.words.size
         measurements()
         fill()
+        return printHtml()
     }
 
     /**
      * Fills up the search array, applies the inputted words, and
      * randomly generates the rest of the characters.
      */
-    fun fill() {
+    private fun fill() {
         var between: Int
         var strlen: Int
         var x: Int
         var y: Int
         var index: Int = 0
-        positions = IntArray(wordCount)
+        positions = arrayListOf<Int>(this.wordCount)
 
         for (word: String in words) {
             strlen = word.length
@@ -101,7 +161,7 @@ class wordSearch() {
      * @return boolean. searches array for the key. returns true if key is in array.
      */
 
-    fun search(numbers, key): Boolean {
+    fun search(numbers: ArrayList<Int>, key: Int): Boolean {
        for (value in numbers) {
             if (value == key) {
                return true //found it!
@@ -111,24 +171,17 @@ class wordSearch() {
     }
 
     /**
-     * Takes user input, processes it and places it in relevate datafields.
-     */
-    fun takeInput() {
-
-    }
-
-    /**
      * Calculates size of the char array the word search uses.
      */
     fun measurements() {
-        println("enerating word search")
-        for (var word: String in words) {
+        println("generating word search")
+        for (word: String in words) {
             if (word.length > width) {
                 width = word.length
             }
         }
         width *= 2
         length = width + (width / 3)
-        search = Array(width, {CharArray(length)})
+        search = arrayListOf<Array<Char>>()
     }
 }
