@@ -31,7 +31,6 @@
 			padding-bottom: 25px;
         }
         div {
-            width: 744px;
             font-size: 43.5px;
             text-align: center;
         }
@@ -45,14 +44,38 @@
 		}
 		.border {
 			border: 1px solid black;
+            width: 744px;
 		}
 		.footer {
 			font-size: 26.1px;
 			margin-top: 25px;
 			width: 690px;
 		}
-		.padPage {
-			padding: 5px 25px 5px 25px;
+		.padPageLeft {
+			padding-top: 48px;
+			padding-bottom: 48px;
+			padding-left: 24px;
+			padding-right: 36px;
+			height: 960px;
+		}
+		.padPageRight {
+			padding-top: 48px;
+			padding-bottom: 48px;
+			padding-left: 36px;
+			padding-right: 24px;
+			height: 960px;
+		}
+
+		.valignTop {
+			vertical-align: top;
+		}
+
+		.valignMiddle {
+			vertical-align: middle;
+		}
+
+		.valignBottom {
+			vertical-align: bottom;
 		}
     </style>
 </head>
@@ -62,7 +85,11 @@
 			<td class="border"><div id="output"></div></td>
 			<td>
 				Title:&nbsp;<input id="title"/><br><br>
-				Phrase to decode:<br><textarea id="input" maxlength="60"></textarea>
+				Phrase to decode:<br><textarea id="input" maxlength="60"></textarea><br><br>
+				<select id = "pagePadSelector">
+					<option value="Right">Right Page</option>
+					<option value="Left">Left Page</option>
+				</select>
 				<button id="pdfPrint">Print PDF</button>
 			</td>
 		</tr>
@@ -70,7 +97,18 @@
 	<script>
 		var columns = 15;
 		var footer = '1=A 2=B 3=C 4=D 5=E 6=F 7=G 8=H 9=I 10=J 11=K 12=L 13=M 14=N 15=O 16=P 17=Q 18=R 19=S 20=T 21=U 22=V 23=W 24=X 25=Y 26=Z';
-		jQuery('#input').change(function() {
+
+		function createLine(arr, row, start, end) {
+		   var tr = '';
+		   for (var idx = start; idx < end; idx++) {
+				tr += '<td>'+arr[idx][row]+'</td>';
+		   }
+		   
+		   tr = '<tr>' + tr + '</tr>';
+		   return tr;
+		}
+		
+		var doWork = function() {
 			var aInt = 'A'.charCodeAt(0);
 			var zInt = 'Z'.charCodeAt(0);
 			var phrase = $('#input').val();
@@ -94,9 +132,7 @@
 
 				coded[coded.length] = [k,  val];
 			}
-			var out='<div class="padPage"><h1>'+$('#title').val()+'</h1>';
-			var td1 = '<tr>';
-			var td2 = '<tr>';
+			var out='<div class="padPage'+jQuery('#pagePadSelector').val()+'" id="outputDiv"><div id="header" class="valignTop"><h1>'+$('#title').val()+'</h1></div><div id="body" class="valignMiddle">';
 			for (var idx = 0; idx < coded.length; idx++) {
 				//space found, find next space
 				if (coded[idx][1] == '&nbsp;' || idx == (coded.length - 1)) {
@@ -115,20 +151,19 @@
 			out += '<table  align="center">';
 			out += createLine(coded, 0, newLineIdx, coded.length);
 			out += createLine(coded, 1, newLineIdx, coded.length);
-			out += '</table><div id="key" class="footer">'+footer+'</div></div>';
+			out += '</table></div><div id="key" class="footer valignBottom">'+footer+'</div></div>';
 			jQuery('#output').html(out);
-		});
+			var headerHeight = jQuery('#header').outerHeight();
+			var bodyHeight = jQuery('#body').outerHeight();
+			var keyHeight = jQuery('#key').outerHeight();
+			var outputHeight = 962;
+			var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
 
-		function createLine(arr, row, start, end) {
-		   var tr = '';
-		   for (var idx = start; idx < end; idx++) {
-				tr += '<td>'+arr[idx][row]+'</td>';
-		   }
-		   
-		   tr = '<tr>' + tr + '</tr>';
-		   return tr;
+			jQuery('#key').css('padding-top', padSize);
+			jQuery('#body').css('padding-top', padSize);
+			return;
 		}
-		
+
 		jQuery('#pdfPrint').click(
 		function () {
 			const filename  = 'Decoder.pdf';
@@ -140,19 +175,9 @@
 			});
 		});
 
-		// Variant
-		// This one lets you improve the PDF sharpness by scaling up the HTML node tree to render as an image before getting pasted on the PDF.
-		function print(quality = 1) {
-			const filename  = 'Decoder.pdf';
-
-			html2canvas(document.querySelector('#output'), 
-									{scale: quality}
-							 ).then(canvas => {
-				let pdf = new jsPDF('p', 'in', 'letter');
-				pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 8.5, 11);
-				pdf.save(filename);
-			});
-		}
+		jQuery('#pagePadSelector').change(function() {doWork();});		
+		jQuery('#title').change(function() {doWork();});
+		jQuery('#input').change(function() {doWork();});
 	</script>
 </body>
 </html>

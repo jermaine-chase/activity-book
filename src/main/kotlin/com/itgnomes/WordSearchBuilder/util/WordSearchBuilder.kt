@@ -24,6 +24,11 @@ class WordSearchBuilder() {
     /** counter for errors **/
     var errorCount: Int = 0
 
+    @GetMapping("/hello")
+    fun helloKotlin(): String {
+        return "hello world"
+    }
+
     /**
      * Prints the finished word search and related information
      */
