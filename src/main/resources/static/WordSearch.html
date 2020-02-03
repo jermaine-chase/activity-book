@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Word Search</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js" integrity="sha256-gJWdmuCRBovJMD9D/TVdo4TIK8u5Sti11764sZT1DhI=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+	<script src="assets/scripts/html2canvas.min.js"></script>
+
+    <style>
+		body {
+			font-family: Cambria,Georgia,serif;
+		}
+        table {
+            padding: 0px;
+        }
+        td {
+            padding: 0px;
+            text-align: center;
+            font-size: 43.5px;
+            width: 45.5px;
+        }
+        tr {
+            padding: 0px;
+        }
+        h1 {
+            font-size: 64px;
+            text-align: center;
+			margin-bottom: 0px;
+			margin-top: 0px;
+			padding-bottom: 25px;
+        }
+        div {
+            font-size: 43.5px;
+            text-align: center;
+        }
+        thead {
+            display: none;
+        }
+		textarea {
+			width: 170px;
+			height: 55px;
+			resize: none;
+		}
+		.border {
+			border: 1px solid black;
+            width: 744px;
+		}
+		.footer {
+			font-size: 26.1px;
+			margin-top: 25px;
+			width: 690px;
+		}
+		.padPageLeft {
+			padding-top: 48px;
+			padding-bottom: 48px;
+			padding-left: 24px;
+			padding-right: 36px;
+			height: 960px;
+		}
+		.padPageRight {
+			padding-top: 48px;
+			padding-bottom: 48px;
+			padding-left: 36px;
+			padding-right: 24px;
+			height: 960px;
+		}
+
+		.valignTop {
+			vertical-align: top;
+		}
+
+		.valignMiddle {
+			vertical-align: middle;
+		}
+
+		.valignBottom {
+			vertical-align: bottom;
+		}
+    </style>
+</head>
+<body>
+	<table>
+		<tr>
+			<td class="border"><div id="output"></div></td>
+			<td>
+				Title:&nbsp;<input id="title"/><br><br>
+				Phrase to decode:<br><textarea id="input" maxlength="60"></textarea><br><br>
+				<select id = "pagePadSelector">
+					<option value="Right">Right Page</option>
+					<option value="Left">Left Page</option>
+				</select>
+				<button id="pdfPrint">Print PDF</button>
+			</td>
+		</tr>
+	</table>
+	<script>
+		var columns = 15;
+		var footer = '1=A 2=B 3=C 4=D 5=E 6=F 7=G 8=H 9=I 10=J 11=K 12=L 13=M 14=N 15=O 16=P 17=Q 18=R 19=S 20=T 21=U 22=V 23=W 24=X 25=Y 26=Z';
+
+		function createLine(arr, row, start, end) {
+		   var tr = '';
+		   for (var idx = start; idx < end; idx++) {
+				tr += '<td>'+arr[idx][row]+'</td>';
+		   }
+		   
+		   tr = '<tr>' + tr + '</tr>';
+		   return tr;
+		}
+		
+		var doWork = function() {
+			var aInt = 'A'.charCodeAt(0);
+			var zInt = 'Z'.charCodeAt(0);
+			var phrase = $('#input').val();
+			var nextIndexOfSpace = phrase.indexOf(' ');
+			var newLineIdx = 0;
+			var coded = [];
+			for (var c = 0; c < phrase.length; c++) {
+				var x = phrase.charAt(c);
+				var j = x.toUpperCase().charCodeAt(0);
+				var k = '__';
+				var val = j - aInt + 1;
+				if (j < aInt || j > zInt) {
+					k = x;
+					if (j == 32) {
+						val = '&nbsp;';
+					}
+					else {
+						val = '';
+					}
+				}
+
+				coded[coded.length] = [k,  val];
+			}
+			var out='<div class="padPage'+jQuery('#pagePadSelector').val()+'" id="outputDiv"><div id="header" class="valignTop"><h1>'+$('#title').val()+'</h1></div><div id="body" class="valignMiddle">';
+			for (var idx = 0; idx < coded.length; idx++) {
+				//space found, find next space
+				if (coded[idx][1] == '&nbsp;' || idx == (coded.length - 1)) {
+					nextIndexOfSpace = phrase.indexOf(' ', nextIndexOfSpace + 1);
+
+					//if next space is beyond the char max, go to new line
+					if (nextIndexOfSpace - newLineIdx > columns || nextIndexOfSpace == -1) {
+						out += '<table align="center">';
+						out += createLine(coded, 0, newLineIdx, idx);
+						out += createLine(coded, 1, newLineIdx, idx);
+						out += '</table>';
+						newLineIdx = idx + 1;
+					}
+				}
+			}
+			out += '<table  align="center">';
+			out += createLine(coded, 0, newLineIdx, coded.length);
+			out += createLine(coded, 1, newLineIdx, coded.length);
+			out += '</table></div><div id="key" class="footer valignBottom">'+footer+'</div></div>';
+			jQuery('#output').html(out);
+			var headerHeight = jQuery('#header').outerHeight();
+			var bodyHeight = jQuery('#body').outerHeight();
+			var keyHeight = jQuery('#key').outerHeight();
+			var outputHeight = 962;
+			var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
+
+			jQuery('#key').css('padding-top', padSize);
+			jQuery('#body').css('padding-top', padSize);
+			return;
+		}
+
+		jQuery('#pdfPrint').click(
+		function () {
+			const filename  = 'Decoder.pdf';
+
+			html2canvas(document.querySelector('#output'), {scale: 2}).then(canvas => {
+				let pdf = new jsPDF('p', 'px', 'letter');
+				pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 450, 590);
+				pdf.save(filename);
+			});
+		});
+
+		jQuery('#pagePadSelector').change(function() {doWork();});		
+		jQuery('#title').change(function() {doWork();});
+		jQuery('#input').change(function() {doWork();});
+	</script>
+</body>
+</html>
