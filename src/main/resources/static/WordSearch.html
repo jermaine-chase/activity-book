@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Word Search</title>
+    <title>Word Search	</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js" integrity="sha256-gJWdmuCRBovJMD9D/TVdo4TIK8u5Sti11764sZT1DhI=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 	<script src="assets/scripts/html2canvas.min.js"></script>
@@ -20,6 +20,9 @@
             font-size: 43.5px;
             width: 45.5px;
         }
+		.admin {
+			font-size: 21.75px;
+		}
         tr {
             padding: 0px;
         }
@@ -45,6 +48,7 @@
 		.border {
 			border: 1px solid black;
             width: 744px;
+			height: 960px;
 		}
 		.footer {
 			font-size: 26.1px;
@@ -65,40 +69,46 @@
 			padding-right: 24px;
 			height: 960px;
 		}
-
 		.valignTop {
 			vertical-align: top;
 		}
-
 		.valignMiddle {
 			vertical-align: middle;
 		}
-
 		.valignBottom {
 			vertical-align: bottom;
+		}
+		.inputDim {
+			width: 24px;
 		}
     </style>
 </head>
 <body>
 	<table>
 		<tr>
-			<td class="border"><div id="output"></div></td>
-			<td>
+			<td class="border">
+				<div id="output"></div>
+			</td>
+			<td class="admin">
 				Title:&nbsp;<input id="title"/><br><br>
-				Phrase to decode:<br><textarea id="input" maxlength="60"></textarea><br><br>
+				Width: <input id="puzzleWidth" class="inputDim"/><br>Height: <input id="puzzleHeight" class="inputDim"/><br><br>
+				Word List (comma separated):<br><textarea id="wordListIn" maxlength="60"></textarea><br><br>
 				<select id = "pagePadSelector">
 					<option value="Right">Right Page</option>
 					<option value="Left">Left Page</option>
-				</select>
-				<button id="pdfPrint">Print PDF</button>
+				</select><br>
+				<button id="generateWordSearch">Generate Word Search</button>&nbsp;<button id="pdfPrint">Print PDF</button>
 			</td>
 		</tr>
 	</table>
 	<script>
+		var width = 0;
+		var height = 0;
+		var positions;
 		var columns = 15;
-		var footer = '1=A 2=B 3=C 4=D 5=E 6=F 7=G 8=H 9=I 10=J 11=K 12=L 13=M 14=N 15=O 16=P 17=Q 18=R 19=S 20=T 21=U 22=V 23=W 24=X 25=Y 26=Z';
+		var wordSearch;
 
-		function createLine(arr, row, start, end) {
+		var createLine = function(arr, row, start, end) {
 		   var tr = '';
 		   for (var idx = start; idx < end; idx++) {
 				tr += '<td>'+arr[idx][row]+'</td>';
@@ -107,61 +117,111 @@
 		   tr = '<tr>' + tr + '</tr>';
 		   return tr;
 		}
+
+		var search = function(numbers, key) {
+			for (var idx = 0; idx < numbers.length; idx++) {
+				if (numbers[idx] === key) {
+					return true; //found it
+				}
+			}
+			return false;
+		}
+
+		var randomRange = function(min, max) {
+			return Math.floor(Math.random() * (max - min) ) + min;
+		}
 		
 		var doWork = function() {
-			var aInt = 'A'.charCodeAt(0);
-			var zInt = 'Z'.charCodeAt(0);
-			var phrase = $('#input').val();
-			var nextIndexOfSpace = phrase.indexOf(' ');
-			var newLineIdx = 0;
-			var coded = [];
-			for (var c = 0; c < phrase.length; c++) {
-				var x = phrase.charAt(c);
-				var j = x.toUpperCase().charCodeAt(0);
-				var k = '__';
-				var val = j - aInt + 1;
-				if (j < aInt || j > zInt) {
-					k = x;
-					if (j == 32) {
-						val = '&nbsp;';
-					}
-					else {
-						val = '';
+			if (jQuery('#wordListIn').val().length > 0) {
+				measurements();
+				fill();
+				out += '<table  align="center">';
+				out += createLine(coded, 0, newLineIdx, coded.length);
+				out += createLine(coded, 1, newLineIdx, coded.length);
+				out += '</table></div><div id="key" class="footer valignBottom">'+footer+'</div></div>';
+				jQuery('#output').html(out);
+				var headerHeight = jQuery('#header').outerHeight();
+				var bodyHeight = jQuery('#body').outerHeight();
+				var keyHeight = jQuery('#key').outerHeight();
+				var outputHeight = 962;
+				var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
+
+				jQuery('#key').css('padding-top', padSize);
+				jQuery('#body').css('padding-top', padSize);
+				return;
+			}
+		}
+
+		var getWordList = function() {
+			var wordList = $('#wordListIn').val();
+			return wordList.split(',');
+		}
+
+		var measurements = function () {
+			var enteredWidth = jQuery('#puzzleWidth').val();
+			var enteredHeight = jQuery('#puzzleHeight').val();
+			var changed = false;
+			
+			var wordArray = getWordList();
+
+			for (var i = 0; i < wordArray.length; i++) {
+				if (wordArray[i].length > width) {
+					width = wordArray[i].length;
+				}
+				if (wordArray[i].length > height) {
+					height = wordArray[i].length;
+				}
+			}
+
+			if (width < enteredWidth) {
+				width = enteredWidth;
+			}
+			if (height < enteredHeight) {
+				height = enteredHeight;
+			}
+			wordSearch = array2D(width, height);
+		}
+
+		var fill = function() {
+			var between;
+			var strlen;
+			var x;
+			var y;
+			var wordArray = getWordList();
+
+			positions = new Array(wordArray.length);
+
+			for (var i = 0; i < wordArray.length; i++) {
+				strlen = wordArray[i].length;
+				between = width - strlen;
+				x = randomRange(0, between);
+				y = randomRange(0, height - 5)
+				if (search(positions, y)) {
+					y++;
+				}
+				positions[i] = y;
+				for (var ind = 0; ind < strlen; ind++) { // for each letter in the word,
+					wordSearch[x][y] = wordArray[i].charAt(ind); // put char into search array
+					x++;
+				}
+			}
+			//fill empty spaces
+			for (var i = 0; i < length; i++) {
+				for (var ind = 0; ind < width; ind++) {
+					if (wordSearch[x][y] == 0) {
+						var t = String.fromCharCode(randomRange(65, 90));
+						wordSearch[ind][i] = t;
 					}
 				}
-
-				coded[coded.length] = [k,  val];
 			}
-			var out='<div class="padPage'+jQuery('#pagePadSelector').val()+'" id="outputDiv"><div id="header" class="valignTop"><h1>'+$('#title').val()+'</h1></div><div id="body" class="valignMiddle">';
-			for (var idx = 0; idx < coded.length; idx++) {
-				//space found, find next space
-				if (coded[idx][1] == '&nbsp;' || idx == (coded.length - 1)) {
-					nextIndexOfSpace = phrase.indexOf(' ', nextIndexOfSpace + 1);
+		}
 
-					//if next space is beyond the char max, go to new line
-					if (nextIndexOfSpace - newLineIdx > columns || nextIndexOfSpace == -1) {
-						out += '<table align="center">';
-						out += createLine(coded, 0, newLineIdx, idx);
-						out += createLine(coded, 1, newLineIdx, idx);
-						out += '</table>';
-						newLineIdx = idx + 1;
-					}
-				}
+		var array2D = function(inWidth, inHeight) {
+			var a2dArray = new Array(inWidth).fill(0);
+			for (o of a2dArray) {
+				o = new Array(inHeight).fill(0);
 			}
-			out += '<table  align="center">';
-			out += createLine(coded, 0, newLineIdx, coded.length);
-			out += createLine(coded, 1, newLineIdx, coded.length);
-			out += '</table></div><div id="key" class="footer valignBottom">'+footer+'</div></div>';
-			jQuery('#output').html(out);
-			var headerHeight = jQuery('#header').outerHeight();
-			var bodyHeight = jQuery('#body').outerHeight();
-			var keyHeight = jQuery('#key').outerHeight();
-			var outputHeight = 962;
-			var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
-
-			jQuery('#key').css('padding-top', padSize);
-			jQuery('#body').css('padding-top', padSize);
-			return;
+			return a2dArray;
 		}
 
 		jQuery('#pdfPrint').click(
@@ -175,9 +235,7 @@
 			});
 		});
 
-		jQuery('#pagePadSelector').change(function() {doWork();});		
-		jQuery('#title').change(function() {doWork();});
-		jQuery('#input').change(function() {doWork();});
+		jQuery('#generateWordSearch').click(function() {doWork();});
 	</script>
 </body>
 </html>
