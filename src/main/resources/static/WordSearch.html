@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Word Search	</title>
+    <title>Word Search</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js" integrity="sha256-gJWdmuCRBovJMD9D/TVdo4TIK8u5Sti11764sZT1DhI=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 	<script src="assets/scripts/html2canvas.min.js"></script>
@@ -13,11 +13,12 @@
 		}
         table {
             padding: 0px;
+			margin-right: 0px;
         }
         td {
             padding: 0px;
             text-align: center;
-            font-size: 43.5px;
+            font-size: 21.75px;
             width: 45.5px;
         }
 		.admin {
@@ -34,7 +35,7 @@
 			padding-bottom: 25px;
         }
         div {
-            font-size: 43.5px;
+            font-size: 21.75px;
             text-align: center;
         }
         thead {
@@ -81,6 +82,12 @@
 		.inputDim {
 			width: 24px;
 		}
+		.outTitle {
+			border-radius: 2.5em;
+			border: 1px solid black;
+            font-size: 32px;
+			padding-bottom: 0px;
+		}
     </style>
 </head>
 <body>
@@ -92,7 +99,7 @@
 			<td class="admin">
 				Title:&nbsp;<input id="title"/><br><br>
 				Width: <input id="puzzleWidth" class="inputDim"/><br>Height: <input id="puzzleHeight" class="inputDim"/><br><br>
-				Word List (comma separated):<br><textarea id="wordListIn" maxlength="60"></textarea><br><br>
+				Word List (comma separated):<br><textarea id="wordListIn"></textarea><br><br>
 				<select id = "pagePadSelector">
 					<option value="Right">Right Page</option>
 					<option value="Left">Left Page</option>
@@ -101,50 +108,52 @@
 			</td>
 		</tr>
 	</table>
+	<script src="assets/scripts/wordsearch.js"></script>
 	<script>
 		var width = 0;
 		var height = 0;
-		var positions;
-		var columns = 15;
-		var wordSearch;
-
-		var createLine = function(arr, row, start, end) {
-		   var tr = '';
-		   for (var idx = start; idx < end; idx++) {
-				tr += '<td>'+arr[idx][row]+'</td>';
-		   }
-		   
-		   tr = '<tr>' + tr + '</tr>';
-		   return tr;
-		}
-
-		var search = function(numbers, key) {
-			for (var idx = 0; idx < numbers.length; idx++) {
-				if (numbers[idx] === key) {
-					return true; //found it
-				}
-			}
-			return false;
-		}
-
-		var randomRange = function(min, max) {
-			return Math.floor(Math.random() * (max - min) ) + min;
-		}
+		var search;
 		
 		var doWork = function() {
-			if (jQuery('#wordListIn').val().length > 0) {
+			var wList = getWordList();
+			if (wList.length > 0) {
+				var out = "";
 				measurements();
-				fill();
-				out += '<table  align="center">';
-				out += createLine(coded, 0, newLineIdx, coded.length);
-				out += createLine(coded, 1, newLineIdx, coded.length);
-				out += '</table></div><div id="key" class="footer valignBottom">'+footer+'</div></div>';
+				search = wordsearch(wList, width, height);
+				out += '<div class="padPage'+jQuery('#pagePadSelector').val()+'" id="outputDiv"><div id ="header"><h1 class="outTitle">'+jQuery('#title').val().toUpperCase()+'</h1></div>';
+				out += '<div id ="body"><table>';
+				for (var i = 0; i <width; i++) {
+					out += '<tr>';
+					for (var c = 0; c < height; c++) {
+						out += '<td>'+search.grid[i][c].toUpperCase()+'</td>'
+					}
+					out += '</tr>';
+				}
+				out += '</table></div><div id="key"><table id="wordListTable">';
+				var placedWords = wList.filter(function(element) {
+					return search.unplaced.indexOf(element) === -1;
+				});
+				var limiter = Math.round(placedWords.length / 3);
+				for (var idx = 0; idx < limiter; idx++) {
+					out += '<tr>';
+					for (var c = idx; c < (idx + (limiter * 3));){
+						if (placedWords[c]) {
+							out += '<td>'+placedWords[c].toUpperCase()+'</td>';
+						}
+						c = c + limiter;
+					}
+					out += '</tr>';
+				}
+				out+= '</table></div></div>';
 				jQuery('#output').html(out);
 				var headerHeight = jQuery('#header').outerHeight();
 				var bodyHeight = jQuery('#body').outerHeight();
 				var keyHeight = jQuery('#key').outerHeight();
 				var outputHeight = 962;
 				var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
+
+				var outputWidth = jQuery('#outputDiv').width();
+				var wordListWidth = jQuery('#wordListTable').width();
 
 				jQuery('#key').css('padding-top', padSize);
 				jQuery('#body').css('padding-top', padSize);
@@ -153,7 +162,7 @@
 		}
 
 		var getWordList = function() {
-			var wordList = $('#wordListIn').val();
+			var wordList = $('#wordListIn').val().toLowerCase();
 			return wordList.split(',');
 		}
 
@@ -179,49 +188,6 @@
 			if (height < enteredHeight) {
 				height = enteredHeight;
 			}
-			wordSearch = array2D(width, height);
-		}
-
-		var fill = function() {
-			var between;
-			var strlen;
-			var x;
-			var y;
-			var wordArray = getWordList();
-
-			positions = new Array(wordArray.length);
-
-			for (var i = 0; i < wordArray.length; i++) {
-				strlen = wordArray[i].length;
-				between = width - strlen;
-				x = randomRange(0, between);
-				y = randomRange(0, height - 5)
-				if (search(positions, y)) {
-					y++;
-				}
-				positions[i] = y;
-				for (var ind = 0; ind < strlen; ind++) { // for each letter in the word,
-					wordSearch[x][y] = wordArray[i].charAt(ind); // put char into search array
-					x++;
-				}
-			}
-			//fill empty spaces
-			for (var i = 0; i < length; i++) {
-				for (var ind = 0; ind < width; ind++) {
-					if (wordSearch[x][y] == 0) {
-						var t = String.fromCharCode(randomRange(65, 90));
-						wordSearch[ind][i] = t;
-					}
-				}
-			}
-		}
-
-		var array2D = function(inWidth, inHeight) {
-			var a2dArray = new Array(inWidth).fill(0);
-			for (o of a2dArray) {
-				o = new Array(inHeight).fill(0);
-			}
-			return a2dArray;
 		}
 
 		jQuery('#pdfPrint').click(

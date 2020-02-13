@@ -85,3 +85,16 @@
 .idea/libraries/Maven__org_xmlunit_xmlunit_core_2_6_3.xml
 .idea/libraries/Maven__org_yaml_snakeyaml_1_25.xml
 src/main/resources/static/Decoder.html
+target/classes/WordSearchBuilder.class
+target/classes/META-INF/WordSearch.kotlin_module
+target/classes/com/itgnomes/WordSearchBuilder/WordSearchBuilderApplication.class
+target/classes/com/itgnomes/WordSearchBuilder/WordSearchBuilderApplicationKt.class
+target/classes/static/WordSearch.html
+target/classes/static/assets/scripts/wordsearch.js
+target/classes/WordSearchBuilder.class
+target/classes/META-INF/WordSearch.kotlin_module
+target/classes/com/itgnomes/WordSearchBuilder/WordSearchBuilderApplication.class
+target/classes/com/itgnomes/WordSearchBuilder/WordSearchBuilderApplicationKt.class
+target/classes/static/WordSearch.html
+target/classes/static/WordSearch.html
+target/classes/static/WordSearch.html
