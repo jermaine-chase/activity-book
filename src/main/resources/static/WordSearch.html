@@ -20,6 +20,9 @@
             text-align: center;
             font-size: 21.75px;
             width: 45.5px;
+            height: 45.5px;
+			text-align: center;
+			width: 231px;
         }
 		.admin {
 			font-size: 21.75px;
@@ -104,7 +107,8 @@
 					<option value="Right">Right Page</option>
 					<option value="Left">Left Page</option>
 				</select><br>
-				<button id="generateWordSearch">Generate Word Search</button>&nbsp;<button id="pdfPrint">Print PDF</button>
+				<button id="generateWordSearch">Generate Word Search</button>&nbsp;<button id="pdfPrint">Print PDF</button><br>
+				<div id="unplaced"></div>
 			</td>
 		</tr>
 	</table>
@@ -116,6 +120,7 @@
 		
 		var doWork = function() {
 			var wList = getWordList();
+			var outputWidth = jQuery('#output').width() - 50;
 			if (wList.length > 0) {
 				var out = "";
 				measurements();
@@ -133,14 +138,15 @@
 				var placedWords = wList.filter(function(element) {
 					return search.unplaced.indexOf(element) === -1;
 				});
-				var limiter = Math.round(placedWords.length / 3);
-				for (var idx = 0; idx < limiter; idx++) {
+				var outerLimiter = Math.ceil(placedWords.length / 3);
+				var innerLimiter = Math.round(placedWords.length / 3);
+				for (var idx = 0; idx < outerLimiter; idx++) {
 					out += '<tr>';
-					for (var c = idx; c < (idx + (limiter * 3));){
+					for (var c = idx; c < (idx + (innerLimiter * 3));){
 						if (placedWords[c]) {
 							out += '<td>'+placedWords[c].toUpperCase()+'</td>';
 						}
-						c = c + limiter;
+						c = c + innerLimiter;
 					}
 					out += '</tr>';
 				}
@@ -152,18 +158,17 @@
 				var outputHeight = 962;
 				var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
 
-				var outputWidth = jQuery('#outputDiv').width();
-				var wordListWidth = jQuery('#wordListTable').width();
-
 				jQuery('#key').css('padding-top', padSize);
 				jQuery('#body').css('padding-top', padSize);
+
+				jQuery('#unplaced').html('These words were not placed: '+search.unplaced);
 				return;
 			}
 		}
 
 		var getWordList = function() {
 			var wordList = $('#wordListIn').val().toLowerCase();
-			return wordList.split(',');
+			return wordList.split(',').sort();
 		}
 
 		var measurements = function () {
@@ -185,8 +190,14 @@
 			if (width < enteredWidth) {
 				width = enteredWidth;
 			}
+			if (width > 25) {
+				width = 15;
+			}
 			if (height < enteredHeight) {
 				height = enteredHeight;
+			}
+			if (height > 25) {
+				height = 15;
 			}
 		}
 
