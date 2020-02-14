@@ -236,7 +236,7 @@
 
 		jQuery('#pdfPrint').click(
 		function () {
-			const filename  = 'Decoder.pdf';
+			const filename  = 'WordSearch.pdf';
 
 			html2canvas(document.querySelector('#output'), {scale: 2}).then(canvas => {
 				let pdf = new jsPDF('p', 'px', 'letter');
