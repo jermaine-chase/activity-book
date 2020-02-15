@@ -10,7 +10,8 @@
 ;
 (function () {
     var LETTERS = 'abcdefghijklmnopqrstuvwxyz'; // letters used for filler
-    var WORD_RE = /^[a-z]+$/; // what a valid word looks like
+    var WORD_RE_EN = /^[a-z]+$/; // what a valid word looks like
+    var WORD_RE_SP = /^[a-zñáéíóúü]+$/i;
     var MAXATTEMPTS = 20; // maximum amount of times to place a word
 
     /**
@@ -28,9 +29,17 @@
         opts.letters = opts.letters || LETTERS;
 
         // filter out any non-words
-        words = words.filter(function (a) {
-                return WORD_RE.test(a);
+        if (opts && opts.hasOwnProperty('lang') && opts.lang === "SP") {
+            words = words.filter(function (a) {
+                    return WORD_RE_SP.test(a);
+                });
+        }
+        //english by default
+        else {
+            words = words.filter(function (a) {
+                return WORD_RE_EN.test(a);
             });
+        }
 
         // sort the words by length (biggest first)
         words.sort(function (a, b) {

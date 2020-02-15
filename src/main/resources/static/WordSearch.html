@@ -6,6 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js" integrity="sha256-gJWdmuCRBovJMD9D/TVdo4TIK8u5Sti11764sZT1DhI=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 	<script src="assets/scripts/html2canvas.min.js"></script>
+	<script src="assets/scripts/wordsearch.js"></script>
 
     <style>
 		body {
@@ -107,24 +108,35 @@
 					<option value="Right">Right Page</option>
 					<option value="Left">Left Page</option>
 				</select><br>
+				<select id = "languageSelector">
+					<option value="EN">English</option>
+					<option value="SP">Spanish</option>
+				</select><br>
 				<button id="generateWordSearch">Generate Word Search</button>&nbsp;<button id="pdfPrint">Print PDF</button><br>
 				<div id="unplaced"></div>
 			</td>
 		</tr>
 	</table>
-	<script src="assets/scripts/wordsearch.js"></script>
 	<script>
 		var width = 0;
 		var height = 0;
 		var search;
 		
 		var doWork = function() {
+			width = 0;
+			height = 0;
 			var wList = getWordList();
 			var outputWidth = jQuery('#output').width() - 50;
 			if (wList.length > 0) {
 				var out = "";
 				measurements();
-				search = wordsearch(wList, width, height);
+				var lang = jQuery('#languageSelector').val();
+				var opts = {"lang": lang};
+				if (lang === "SP") {
+					opts.letters = "abcdefghijklmnñopqrstuvwxyz";
+				}
+				
+				search = wordsearch(wList, width, height, opts);
 				out += '<div class="padPage'+jQuery('#pagePadSelector').val()+'" id="outputDiv"><div id ="header"><h1 class="outTitle">'+jQuery('#title').val().toUpperCase()+'</h1></div>';
 				out += '<div id ="body"><table>';
 				for (var i = 0; i <width; i++) {
