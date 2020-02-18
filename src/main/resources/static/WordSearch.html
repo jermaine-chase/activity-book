@@ -213,7 +213,12 @@
 
 		var getWordList = function() {
 			var wordList = $('#wordListIn').val().toLowerCase();
-			return wordList.split(',').sort();
+			var wordArray = [];
+			for (word of wordList.split(',')) {
+				wordArray.push(word.trim());
+			}
+			
+			return wordArray.sort();
 		}
 
 		var measurements = function () {

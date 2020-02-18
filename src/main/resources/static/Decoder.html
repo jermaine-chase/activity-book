@@ -101,7 +101,9 @@
 	<script>
 		var columns = 15;
 		var alphabet_EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		var alphabet_SP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		var alphabet_SP = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ';
+		var specialCharacters_SP = {'Á':'A', 'É':'E', 'Í':'I', 'Ó':'O', 'Ú':'U', 'Ü':'U'};
+
 		//var footer = '1=A 2=B 3=C 4=D 5=E 6=F 7=G 8=H 9=I 10=J 11=K 12=L 13=M 14=N 15=O 16=P 17=Q 18=R 19=S 20=T 21=U 22=V 23=W 24=X 25=Y 26=Z';
 
 		var footer = function(lang) {
@@ -114,7 +116,7 @@
 				input = alphabet_EN;
 			}
 			for (var idx = 0;idx < input.length; idx++) {
-				out = (idx+1) +"="+input.charAt(idx)+" ";
+				out += (idx+1) +"="+input.charAt(idx)+" ";
 			}
 			return out;
 		}
@@ -136,11 +138,19 @@
 			var nextIndexOfSpace = phrase.indexOf(' ');
 			var newLineIdx = 0;
 			var coded = [];
+			//create the hidden message
 			for (var c = 0; c < phrase.length; c++) {
 				var x = phrase.charAt(c);
+				var isSpecialChar = false;
 				var j = x.toUpperCase().charCodeAt(0);
+				var originalChar = j;
+				if (lang === 'SP' && specialCharacters_SP.hasOwnProperty(j)) {
+					j = specialCharacters_SP[j];
+					isSpecialChar = true;
+				}
 				var k = '__';
 				var val = j - aInt + 1;
+				//if this is A - Z, display underscores, else display the special characters
 				if (j < aInt || j > zInt) {
 					k = x;
 					if (j == 32) {
@@ -154,6 +164,7 @@
 				coded[coded.length] = [k,  val];
 			}
 			var out='<div class="padPage'+jQuery('#pagePadSelector').val()+'" id="outputDiv"><div id="header" class="valignTop"><h1>'+$('#title').val()+'</h1></div><div id="body" class="valignMiddle">';
+			//create output for the table
 			for (var idx = 0; idx < coded.length; idx++) {
 				//space found, find next space
 				if (coded[idx][1] == '&nbsp;' || idx == (coded.length - 1)) {
