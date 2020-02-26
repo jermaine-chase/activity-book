@@ -20,10 +20,9 @@
             padding: 0px;
             text-align: center;
             font-size: 21.75px;
-            width: 45.5px;
-            height: 45.5px;
+            width: 25.2px;
+            height: 25.2px;
 			text-align: center;
-			width: 231px;
         }
 		.admin {
 			font-size: 21.75px;
@@ -86,9 +85,10 @@
 		.inputDim {
 			width: 24px;
 		}
+		.myWidth {
+			width: 231px;
+		}
 		.outTitle {
-			border-radius: 2.5em;
-			border: 1px solid black;
             font-size: 32px;
 			padding-bottom: 0px;
 		}
@@ -135,10 +135,11 @@
 				if (lang === "SP") {
 					opts.letters = "abcdefghijklmnñopqrstuvwxyz";
 				}
-				
-				search = wordsearch(wList, width, height, opts);
+				do {
+					search = wordsearch(wList, width, height, opts);
+				} while (search.unplaced.length > 0);
 				out += '<div class="padPage'+jQuery('#pagePadSelector').val()+'" id="outputDiv"><div id ="header"><h1 class="outTitle">'+jQuery('#title').val().toUpperCase()+'</h1></div>';
-				out += '<div id ="body"><table>';
+				out += '<div id ="body"><table id="wordSearchOutput">';
 				for (var i = 0; i <width; i++) {
 					out += '<tr>';
 					for (var c = 0; c < height; c++) {
@@ -169,7 +170,7 @@
 				for (var idx = 0; idx < sentinel; idx++) {
 					out += '<tr>';
 					if (placedWords[idx] && !displayed.includes(idx)) {
-						out += '<td>'+placedWords[idx].toUpperCase()+'</td>';
+						out += '<td class="myWidth">'+placedWords[idx].toUpperCase()+'</td>';
 						displayed.push(idx);
 					}
 					
@@ -180,7 +181,7 @@
 						offSet = 1;
 					}
 					if (placedWords[nOver3 + offSet + idx] && !displayed.includes(nOver3 + offSet + idx)) {
-						out += '<td>'+placedWords[nOver3 + offSet + idx].toUpperCase()+'</td>';
+						out += '<td class="myWidth">'+placedWords[nOver3 + offSet + idx].toUpperCase()+'</td>';
 						displayed.push(nOver3 + offSet + idx);
 					}
 					if (remainder == 1) {
@@ -190,13 +191,18 @@
 						offSet = 2;
 					}
 					if (placedWords[2 * nOver3 + offSet + idx] && !displayed.includes(2 * nOver3 + offSet + idx)) {
-						out += '<td>'+placedWords[2 * nOver3 + offSet + idx].toUpperCase()+'</td>';
+						out += '<td class="myWidth">'+placedWords[2 * nOver3 + offSet + idx].toUpperCase()+'</td>';
 						displayed.push(2 * nOver3 + offSet + idx);
 					}
 					out += '</tr>';
 				}
 				out+= '</table></div></div>';
 				jQuery('#output').html(out);
+
+				var bodyWidth = jQuery('#body').outerWidth();
+				var wordSearcWidth = jQuery('#wordSearchOutput').outerWidth();
+				var widthPad = (bodyWidth - wordSearcWidth) / 2;
+
 				var headerHeight = jQuery('#header').outerHeight();
 				var bodyHeight = jQuery('#body').outerHeight();
 				var keyHeight = jQuery('#key').outerHeight();
@@ -205,6 +211,7 @@
 
 				jQuery('#key').css('padding-top', padSize);
 				jQuery('#body').css('padding-top', padSize);
+				jQuery('#wordSearchOutput').css('padding-left', widthPad);
 
 				jQuery('#unplaced').html('These words were not placed: '+search.unplaced);
 				return;
