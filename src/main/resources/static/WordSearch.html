@@ -227,7 +227,9 @@
 			var wordList = $('#wordListIn').val().toLowerCase();
 			var wordArray = [];
 			for (word of wordList.split(',')) {
-				wordArray.push(word.trim());
+				if (word.trim() !== '') {
+					wordArray.push(word.trim());
+				}
 			}
 			
 			return wordArray.sort();
