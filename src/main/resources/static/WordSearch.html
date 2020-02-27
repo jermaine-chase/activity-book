@@ -102,7 +102,7 @@
 			</td>
 			<td class="admin">
 				Title:&nbsp;<input id="title"/><br><br>
-				Width: <input id="puzzleWidth" class="inputDim"/><br>Height: <input id="puzzleHeight" class="inputDim"/><br><br>
+				Width: <input id="puzzleWidth" class="inputDim" value="15"/><br>Height: <input id="puzzleHeight" class="inputDim" value="15"/><br><br>
 				Word List (comma separated):<br><textarea id="wordListIn"></textarea><br><br>
 				<select id = "pagePadSelector">
 					<option value="Right">Right Page</option>
@@ -121,7 +121,8 @@
 		var width = 0;
 		var height = 0;
 		var search;
-		
+		var child;
+
 		var doWork = function() {
 			width = 0;
 			height = 0;
@@ -197,6 +198,10 @@
 					out += '</tr>';
 				}
 				out+= '</table></div></div>';
+				//child = window.open("wordOut.html", "mywin", '');
+       			//OpenWindow.dataFromParent = out; // dataFromParent is a variable in child.html
+				//OpenWindow.init();
+				//child.document.getElementById("output").innerHTML = out;
 				jQuery('#output').html(out);
 
 				var bodyWidth = jQuery('#body').outerWidth();
@@ -206,7 +211,7 @@
 				var headerHeight = jQuery('#header').outerHeight();
 				var bodyHeight = jQuery('#body').outerHeight();
 				var keyHeight = jQuery('#key').outerHeight();
-				var outputHeight = 962;
+				var outputHeight = 902;
 				var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
 
 				jQuery('#key').css('padding-top', padSize);
@@ -262,7 +267,7 @@
 		function () {
 			const filename  = 'WordSearch.pdf';
 
-			html2canvas(document.querySelector('#output'), {scale: 2}).then(canvas => {
+			html2canvas(document.querySelector('#output'), {scale: 0.85}).then(canvas => {
 				let pdf = new jsPDF('p', 'px', 'letter');
 				pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 450, 590);
 				pdf.save(filename);
@@ -270,6 +275,18 @@
 		});
 
 		jQuery('#generateWordSearch').click(function() {doWork();});
+
+		var printToPdf = function() {
+			//highlight stuff in output div for printing
+			//won't work in IE
+			var range = document.createRange();
+        	range.selectNode(document.getElementById('output'));
+        	window.getSelection().removeAllRanges();
+			window.getSelection().addRange(range);
+			
+			//invoke print command
+			
+		}
 	</script>
 </body>
 </html>
