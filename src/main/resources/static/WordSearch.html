@@ -276,7 +276,7 @@
 
 		jQuery('#generateWordSearch').click(function() {doWork();});
 
-		var printToPdf = function() {
+		jQuery('#output').click(function() {
 			//highlight stuff in output div for printing
 			//won't work in IE
 			var range = document.createRange();
@@ -286,7 +286,9 @@
 			
 			//invoke print command
 			
-		}
+		});
+
+		
 	</script>
 </body>
 </html>
