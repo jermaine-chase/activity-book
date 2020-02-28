@@ -85,7 +85,7 @@
 			<td class="border"><div id="output"></div></td>
 			<td>
 				Title:&nbsp;<input id="title"/><br><br>
-				Phrase to decode:<br><textarea id="input" maxlength="60"></textarea><br><br>
+				Phrase to decode:<br><textarea id="input"></textarea><br><br>
 				<select id = "pagePadSelector">
 					<option value="Right">Right Page</option>
 					<option value="Left">Left Page</option>
@@ -103,8 +103,6 @@
 		var alphabet_EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		var alphabet_SP = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ';
 		var specialCharacters_SP = {'Á':'A', 'É':'E', 'Í':'I', 'Ó':'O', 'Ú':'U', 'Ü':'U'};
-
-		//var footer = '1=A 2=B 3=C 4=D 5=E 6=F 7=G 8=H 9=I 10=J 11=K 12=L 13=M 14=N 15=O 16=P 17=Q 18=R 19=S 20=T 21=U 22=V 23=W 24=X 25=Y 26=Z';
 
 		var footer = function(lang) {
 			var out = "";
@@ -188,7 +186,7 @@
 			var headerHeight = jQuery('#header').outerHeight();
 			var bodyHeight = jQuery('#body').outerHeight();
 			var keyHeight = jQuery('#key').outerHeight();
-			var outputHeight = 962;
+			var outputHeight = 902;
 			var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
 
 			jQuery('#key').css('padding-top', padSize);
@@ -208,6 +206,18 @@
 		});
 
 		jQuery('#createDecoder').click(function() {doWork();});
+
+		jQuery('#output').click(function() {
+			//highlight stuff in output div for printing
+			//won't work in IE
+			var range = document.createRange();
+        	range.selectNode(document.getElementById('output'));
+        	window.getSelection().removeAllRanges();
+			window.getSelection().addRange(range);
+			
+			//invoke print command
+			
+		});
 	</script>
 </body>
 </html>
