@@ -106,3 +106,6 @@ target/classes/static/Decoder.html
 target/classes/static/Decoder.zip
 target/classes/static/WordSearch.html
 target/classes/static/ws_dc.zip
+src/main/resources/static/ws_dc.zip
+target/classes/static/Decoder.html
+target/classes/static/WordSearch.html
