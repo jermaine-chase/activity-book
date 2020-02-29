@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Word Scramble</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <style>
+		body {
+			font-family: Cambria,Georgia,serif;
+		}
+        table {
+            padding: 0px;
+			margin-right: 0px;
+        }
+        td {
+            padding: 0px;
+            text-align: center;
+            font-size: 21.75px;
+            width: 25.2px;
+            height: 25.2px;
+			text-align: center;
+        }
+		.admin {
+			font-size: 21.75px;
+		}
+        tr {
+            padding: 0px;
+        }
+		img {
+			max-width: 200px;
+			max-height: 200px;
+		}
+        h1 {
+            font-size: 48px;
+            text-align: center;
+			margin-bottom: 0px;
+			margin-top: 0px;
+			padding-bottom: 25px;
+        }
+        div {
+            font-size: 21.75px;
+            text-align: center;
+        }
+        thead {
+            display: none;
+        }
+		textarea {
+			width: 170px;
+			height: 55px;
+			resize:vertical;
+		}
+		.border {
+			border: 1px solid black;
+            width: 744px;
+			height: 960px;
+		}
+		.footer {
+			font-size: 26.1px;
+			margin-top: 25px;
+			width: 690px;
+		}
+		.padPageLeft {
+			padding-top: 48px;
+			padding-bottom: 48px;
+			padding-left: 24px;
+			padding-right: 36px;
+			height: 960px;
+		}
+		.padPageRight {
+			padding-top: 48px;
+			padding-bottom: 48px;
+			padding-left: 36px;
+			padding-right: 24px;
+			height: 960px;
+		}
+		.valignTop {
+			vertical-align: top;
+		}
+		.valignMiddle {
+			vertical-align: middle;
+		}
+		.valignBottom {
+			vertical-align: bottom;
+		}
+		.inputDim {
+			width: 36px;
+		}
+		.myWidth {
+			width: 231px;
+		}
+		.outTitle {
+			padding-bottom: 0px;
+		}
+		.outBody {
+			font-size: 36px !important;
+		}
+    </style>
+</head>
+<body>
+	<table>
+		<tr>
+			<td class="border">
+				<div id="output"></div>
+			</td>
+			<td class="admin">
+				Title:&nbsp;<input id="title"/><br><br>
+				Word List (comma separated):<br><textarea id="wordListIn"></textarea><br><br>
+				Image URL:&nbsp;<input id="imageUrl"/><br><br>
+				<select id = "pagePadSelector">
+					<option value="Right">Right Page</option>
+					<option value="Left">Left Page</option>
+				</select><br>
+				<select id = "languageSelector">
+					<option value="EN">English</option>
+					<option value="SP">Spanish</option>
+				</select><br>
+				<button id="generateWordScramble">Generate Word Search</button><br>
+				<div id="unplaced"></div>
+			</td>
+			<img src=""/>
+		</tr>
+	</table>
+	<script>
+		var width = 0;
+		var height = 0;
+		var search;
+		var child;
+
+		var doWork = function() {
+			width = 0;
+			height = 0;
+			var wList = getWordList();
+			if (wList.length > 0) {
+				var out = '<div id ="header"><h1 class="outTitle">'+jQuery('#title').val().toUpperCase()+'</h1></div>';
+				var lang = jQuery('#languageSelector').val();
+				var opts = {"lang": lang};
+				
+				out += '<div id = "body" class="container">';
+				for (var idx = 0; idx < wList.length; idx++) {
+					out += '<div class="row">';
+					out += '<div class="col-5 outBody">'+scrambleWord(wList[idx])+'</div><div class="col-5 outBody">'+makeDashes(wList[idx])+'</div>';
+					out += '</div>';
+				}
+				out += '</div><div id = "key" class="container"><div class="row"><div class="col-6">Word List</div><div class="col-6"></div></div><div class="row">';
+
+				//default for divisible by 3
+				//link to  mathematical formulae
+				//https://docs.google.com/document/d/1izmXXCpvi8ZoYrUptmEVlONKMRhn6kQOYvN20ZC4vcM/edit?usp=sharing
+
+				var nOver3 = Math.floor(wList.length / 3);
+				var sentinel = nOver3;
+				var remainder = wList.length % 3;
+				var offSet = 0;
+				var displayed = [];
+				if (remainder == 1) {
+					sentinel = nOver3 + 1;
+				}
+				else if (remainder == 2) {
+					sentinel = nOver3 + 1;
+				}
+				for (var index = 0; index < 3; index++) {
+					out += '<div class="col-2 valignBottom">';
+					if (index == 1) {
+						if (remainder == 1) {
+							sentinel = nOver3;
+							offSet = 1;
+						}
+						else if (remainder == 2) {
+							offSet = 1;
+						}
+					}
+					else if (index == 2) {
+						if (remainder == 1) {
+							offSet = 1;
+						}
+						else if (remainder == 2) {
+							offSet = 2;
+						}
+					}
+					for (var idx = 0; idx < sentinel; idx++) {
+						var k = index * nOver3 + offSet + idx;
+						if (wList[k] && !displayed.includes(k)) {
+							out += wList[k].toUpperCase() + '<br>';
+							displayed.push(index * nOver3 + offSet + idx);
+						}
+					}
+					out += '</div>';
+				}
+				out+= '<div class="col-6"><img src="'+jQuery('#imageUrl').val()+'"/><div></div></div></div></div>';
+				jQuery('#output').html(out);
+
+				var headerHeight = jQuery('#header').outerHeight();
+				var bodyHeight = jQuery('#body').outerHeight();
+				var keyHeight = jQuery('#key').outerHeight();
+				var outputHeight = 1200;
+				var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
+
+				jQuery('#key').css('padding-top', padSize);
+				jQuery('#body').css('padding-top', padSize);
+
+				return;
+			}
+		}
+
+		var scrambleWord = function(word) {
+			var returnVal = '';
+			var placed = [];
+			for (var idx = 0; idx < word.length; idx++) {
+				var k = 0;
+				do {
+					k = Math.floor(Math.random() * word.length);
+				} while (placed.length > 0 && placed.includes(k));
+				returnVal += word[k].toUpperCase();
+				if (idx != word.length - 1) {
+					returnVal += '&nbsp;';
+				}
+				placed.push(k);
+			}
+			return returnVal;
+		}
+
+		var makeDashes = function(word) {
+			var k = '__';
+			var returnVal = '';
+			for (var idx = 0; idx < word.length; idx++) {
+				returnVal += k;
+				if (idx != word.length - 1) {
+					returnVal += '&nbsp;';
+				}
+			}
+			return returnVal;
+		}
+
+		var getWordList = function() {
+			var wordList = $('#wordListIn').val().toLowerCase();
+			var wordArray = [];
+			for (word of wordList.split(',')) {
+				if (word.trim() !== '') {
+					wordArray.push(word.trim());
+				}
+			}
+			
+			return wordArray.sort();
+		}
+
+		jQuery('#generateWordScramble').click(function() {doWork();});
+
+		jQuery('#output').click(function() {
+			//highlight stuff in output div for printing
+			//won't work in IE
+			var range = document.createRange();
+        	range.selectNode(document.getElementById('output'));
+        	window.getSelection().removeAllRanges();
+			window.getSelection().addRange(range);
+			
+			//invoke print command
+			
+		});
+
+		
+	</script>
+</body>
+</html>
