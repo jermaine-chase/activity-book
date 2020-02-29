@@ -134,7 +134,8 @@
 		var doWork = function() {
 			width = 0;
 			height = 0;
-			var wList = getWordList();
+			var wList = getWordList(true);
+			var imageUrlExists = jQuery('#imageUrl').val() !== '';
 			if (wList.length > 0) {
 				var out = '<div id ="header"><h1 class="outTitle">'+jQuery('#title').val().toUpperCase()+'</h1></div>';
 				var lang = jQuery('#languageSelector').val();
@@ -146,12 +147,17 @@
 					out += '<div class="col-5 outBody">'+scrambleWord(wList[idx])+'</div><div class="col-5 outBody">'+makeDashes(wList[idx])+'</div>';
 					out += '</div>';
 				}
-				out += '</div><div id = "key" class="container"><div class="row"><div class="col-6">Word List</div><div class="col-6"></div></div><div class="row">';
-
+				if (imageUrlExists) {
+					out += '</div><div id = "key" class="container"><div class="row"><div class="col-6">Word List</div><div class="col-6"></div></div><div class="row">';
+				}
+				else {
+					out += '</div><div id = "key" class="container"><div class="row"><div class="col-10">Word List</div></div><div class="row">';
+				}
 				//default for divisible by 3
 				//link to  mathematical formulae
 				//https://docs.google.com/document/d/1izmXXCpvi8ZoYrUptmEVlONKMRhn6kQOYvN20ZC4vcM/edit?usp=sharing
 
+				wList = getWordList(false);
 				var nOver3 = Math.floor(wList.length / 3);
 				var sentinel = nOver3;
 				var remainder = wList.length % 3;
@@ -164,7 +170,12 @@
 					sentinel = nOver3 + 1;
 				}
 				for (var index = 0; index < 3; index++) {
-					out += '<div class="col-2 valignBottom">';
+					if (imageUrlExists) {
+						out += '<div class="col-2 valignBottom">';
+					}
+					else {
+						out += '<div class="col-4 valignBottom">';
+					}
 					if (index == 1) {
 						if (remainder == 1) {
 							sentinel = nOver3;
@@ -191,7 +202,12 @@
 					}
 					out += '</div>';
 				}
-				out+= '<div class="col-6"><img src="'+jQuery('#imageUrl').val()+'"/><div></div></div></div></div>';
+				if (imageUrlExists) {
+					out+= '<div class="col-6"><img src="'+jQuery('#imageUrl').val()+'"/><div></div></div></div></div>';
+				}
+				else {
+					out+= '</div></div></div></div>';
+				}
 				jQuery('#output').html(out);
 
 				var headerHeight = jQuery('#header').outerHeight();
@@ -236,7 +252,7 @@
 			return returnVal;
 		}
 
-		var getWordList = function() {
+		var getWordList = function(sort) {
 			var wordList = $('#wordListIn').val().toLowerCase();
 			var wordArray = [];
 			for (word of wordList.split(',')) {
@@ -244,8 +260,12 @@
 					wordArray.push(word.trim());
 				}
 			}
-			
-			return wordArray.sort();
+			if (sort) {
+				return wordArray.sort();
+			}
+			else {
+				return wordArray;
+			}
 		}
 
 		jQuery('#generateWordScramble').click(function() {doWork();});
