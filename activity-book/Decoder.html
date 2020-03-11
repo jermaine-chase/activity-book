@@ -3,44 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>Decoder</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js" integrity="sha256-gJWdmuCRBovJMD9D/TVdo4TIK8u5Sti11764sZT1DhI=" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-	<script src="assets/scripts/html2canvas.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <style>
 		body {
 			font-family: Cambria,Georgia,serif;
+			font-size: initial;
 		}
-        table {
-            padding: 0px;
-        }
-        td {
-            padding: 0px;
-            text-align: center;
-            font-size: 43.5px;
-            width: 45.5px;
-        }
-        tr {
-            padding: 0px;
-        }
+		span {
+			text-align: center;
+			display: inline-block;
+			font-size: 40px;
+			border-top: black 5px;
+			margin-right: 2px;
+			width: 45px;
+		}
         h1 {
             font-size: 64px;
+			font-weight: bold;
             text-align: center;
 			margin-bottom: 0px;
 			margin-top: 0px;
 			padding-bottom: 25px;
         }
         div {
-            font-size: 43.5px;
             text-align: center;
-        }
-        thead {
-            display: none;
         }
 		textarea {
 			width: 170px;
 			height: 55px;
-			resize: none;
+			resize: vertical;
 		}
 		.border {
 			border: 1px solid black;
@@ -50,56 +46,86 @@
 			font-size: 26.1px;
 			margin-top: 25px;
 			width: 690px;
+			text-align: center;
 		}
-		.padPageLeft {
-			padding-top: 48px;
-			padding-bottom: 48px;
-			padding-left: 24px;
-			padding-right: 36px;
-			height: 960px;
+		.decode {
+			text-align: center;
+			position: relative;
+			/* height: 75px; */
+			margin-top: 35px;
 		}
-		.padPageRight {
-			padding-top: 48px;
-			padding-bottom: 48px;
-			padding-left: 36px;
-			padding-right: 24px;
-			height: 960px;
-		}
-
-		.valignTop {
-			vertical-align: top;
+		.decode:before {
+			display: block;
+			border-bottom: 1px solid black;
+			/*width:  calc( 100% - 10px );*/
+			content: " ";
 		}
 
-		.valignMiddle {
-			vertical-align: middle;
+		.word {
+			display: inline-block;
+			margin: 0 5px 50px 0;
+			height: 75px;
+			/* border: 1px solid purple; */
+			position: relative;
 		}
 
-		.valignBottom {
-			vertical-align: bottom;
+		#body {
+			font-size: 25px;
+		}
+		.numbers {
+			font-size: 24px;
+		}
+		.punctuation {
+			width: 12px !important;
+			text-align: left;
+			top: -57px;
+			position: relative;
+		}
+		.noPad {
+			padding: 0px;
+		}
+		@media print{
+			.ignore{
+				display: none;
+			}
+
+			.border,
+			#output{
+				width: 100%;
+				min-width: 100%;
+				height: 100%;
+				max-height: 100%;
+				border:0 !important;
+			}
 		}
     </style>
 </head>
 <body>
-	<table>
-		<tr>
-			<td class="border"><div id="output"></div></td>
-			<td>
-				Title:&nbsp;<input id="title"/><br><br>
-				Phrase to decode:<br><textarea id="input"></textarea><br><br>
-				<select id = "pagePadSelector">
-					<option value="Right">Right Page</option>
-					<option value="Left">Left Page</option>
-				</select><br>
+	<div><h1 class="ignore">Decoder</h1></div>
+	<div class='container'>
+		<div class='row ignore'>
+			<div class='-3'>
+				Title:<br><input id="title"/>
+			</div>
+			<div class='col-3'>
+				Phrase to decode:<br><textarea id="input"></textarea>
+			</div>
+			<div class='col-3'>
 				<select id = "languageSelector">
 					<option value="EN">English</option>
 					<option value="SP">Spanish</option>
-				</select><br>
-				<button id="createDecoder">Create Decoder</button>&nbsp;<button id="pdfPrint">Print PDF</button><br>
-			</td>
-		</tr>
-	</table>
+				</select>
+			</div>
+			<div class='col-3'>
+				<button id="createDecoder">Create Decoder</button>
+			</div>
+		</div>
+		<div class='row'>
+			<div id="output"></div>
+		</div>
+	</div>
 	<script>
-		var columns = 15;
+		//var columns = 18;
 		var alphabet_EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		var alphabet_SP = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ';
 		var specialCharacters_SP = {'Á':'A', 'É':'E', 'Í':'I', 'Ó':'O', 'Ú':'U', 'Ü':'U'};
@@ -114,17 +140,33 @@
 				input = alphabet_EN;
 			}
 			for (var idx = 0;idx < input.length; idx++) {
-				out += (idx+1) +"="+input.charAt(idx)+" ";
+				var separator = ' ';
+				if (idx % 10 == 0 && idx > 0) {
+					separator = '<br/>'
+				}
+				out += (idx+1) +'='+input.charAt(idx)+separator;
 			}
 			return out;
 		}
-		var createLine = function(arr, row, start, end) {
-		   var tr = '';
+
+		var createLine = function(arr, start, end) {
+		   var tr = '<div class="word">';
+		   var td = '';
 		   for (var idx = start; idx < end; idx++) {
-				tr += '<td>'+arr[idx][row]+'</td>';
+			   if (arr[idx].type === 'c') {
+				td = '<span class="decode">';
+			   }
+			   else if (arr[idx].type === 's') {
+				td = '</div><div class="word"><span>';
+			   }
+			   else if (arr[idx].type === 'p') {
+				td = '<span class="punctuation">';
+			   }
+			   //tr += td + arr[idx].hold + '<br>' + arr[idx].num + '</span>&nbsp;';
+                tr += td + arr[idx].hold + arr[idx].num + '</span>';
 		   }
 		   
-		   tr = '<tr>' + tr + '</tr>';
+		   tr = '' + tr + '</div>';
 		   return tr;
 		}
 		
@@ -139,6 +181,7 @@
 			//create the hidden message
 			for (var c = 0; c < phrase.length; c++) {
 				var x = phrase.charAt(c);
+				var charType = 'c' //c = Character;
 				var isSpecialChar = false;
 				var j = x.toUpperCase().charCodeAt(0);
 				var originalChar = j;
@@ -146,47 +189,51 @@
 					j = specialCharacters_SP[j];
 					isSpecialChar = true;
 				}
-				var k = '__';
+				var k = '';
 				var val = j - aInt + 1;
 				//if this is A - Z, display underscores, else display the special characters
 				if (j < aInt || j > zInt) {
 					k = x;
 					if (j == 32) {
 						val = '&nbsp;';
+						charType = 's'//s = Space
 					}
 					else {
 						val = '';
+						charType = 'p';//p = Punctuation
 					}
 				}
+				var decodedObj = {
+					hold: k,
+					num: val,
+					type: charType
+				};
 
-				coded[coded.length] = [k,  val];
+				coded.push(decodedObj);
+				//coded[coded.length] = [k,  val];
 			}
-			var out='<div class="padPage'+jQuery('#pagePadSelector').val()+'" id="outputDiv"><div id="header" class="valignTop"><h1>'+$('#title').val()+'</h1></div><div id="body" class="valignMiddle">';
+			var out='<div class = "container" id="outputDiv"><div class = "row align-items-start justify-content-center" id="header"><h1>'+$('#title').val()+'</h1></div><div class="row align-items-center justify-content-center" id="body">';
 			//create output for the table
-			for (var idx = 0; idx < coded.length; idx++) {
+			///for (var idx = 0; idx < coded.length; idx++) {
 				//space found, find next space
-				if (coded[idx][1] == '&nbsp;' || idx == (coded.length - 1)) {
-					nextIndexOfSpace = phrase.indexOf(' ', nextIndexOfSpace + 1);
+				//if (coded[idx] && (coded[idx].num === '&nbsp;' || idx === (coded.length - 1))) {
+					//nextIndexOfSpace = phrase.indexOf(' ', nextIndexOfSpace + 1);
 
 					//if next space is beyond the char max, go to new line
-					if (nextIndexOfSpace - newLineIdx > columns || nextIndexOfSpace == -1) {
-						out += '<table align="center">';
-						out += createLine(coded, 0, newLineIdx, idx);
-						out += createLine(coded, 1, newLineIdx, idx);
-						out += '</table>';
-						newLineIdx = idx + 1;
-					}
-				}
-			}
-			out += '<table  align="center">';
-			out += createLine(coded, 0, newLineIdx, coded.length);
-			out += createLine(coded, 1, newLineIdx, coded.length);
-			out += '</table></div><div id="key" class="footer valignBottom">'+footer(lang)+'</div></div>';
+					//if (nextIndexOfSpace - newLineIdx > columns || nextIndexOfSpace == -1) {
+						out += '<div class="row"><div class="col">' + createLine(coded, 0, coded.length) + '</div></div>';
+						//newLineIdx = idx + 1;
+					//}
+				//}
+			//}
+
+			//out += '<div class="row">' + createLine(coded, newLineIdx, coded.length) + '</div>';
+			out += '</div><div id="key" class="row"><div class="col footer">'+footer(lang)+'</div></div>';
 			jQuery('#output').html(out);
 			var headerHeight = jQuery('#header').outerHeight();
 			var bodyHeight = jQuery('#body').outerHeight();
 			var keyHeight = jQuery('#key').outerHeight();
-			var outputHeight = 902;
+			var outputHeight = 1300;
 			var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
 
 			jQuery('#key').css('padding-top', padSize);
@@ -194,30 +241,7 @@
 			return;
 		}
 
-		jQuery('#pdfPrint').click(
-		function () {
-			const filename  = 'Decoder.pdf';
-
-			html2canvas(document.querySelector('#output'), {scale: 2}).then(canvas => {
-				let pdf = new jsPDF('p', 'px', 'letter');
-				pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 450, 590);
-				pdf.save(filename);
-			});
-		});
-
 		jQuery('#createDecoder').click(function() {doWork();});
-
-		jQuery('#output').click(function() {
-			//highlight stuff in output div for printing
-			//won't work in IE
-			var range = document.createRange();
-        	range.selectNode(document.getElementById('output'));
-        	window.getSelection().removeAllRanges();
-			window.getSelection().addRange(range);
-			
-			//invoke print command
-			
-		});
 	</script>
 </body>
 </html>
