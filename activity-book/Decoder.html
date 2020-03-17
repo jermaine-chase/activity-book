@@ -43,7 +43,7 @@
             width: 744px;
 		}
 		.footer {
-			font-size: 26.1px;
+			font-size: 30px;
 			margin-top: 25px;
 			width: 690px;
 			text-align: center;
@@ -51,13 +51,11 @@
 		.decode {
 			text-align: center;
 			position: relative;
-			/* height: 75px; */
 			margin-top: 35px;
 		}
 		.decode:before {
 			display: block;
 			border-bottom: 1px solid black;
-			/*width:  calc( 100% - 10px );*/
 			content: " ";
 		}
 
@@ -65,7 +63,6 @@
 			display: inline-block;
 			margin: 0 5px 50px 0;
 			height: 75px;
-			/* border: 1px solid purple; */
 			position: relative;
 		}
 
@@ -125,10 +122,10 @@
 		</div>
 	</div>
 	<script>
-		//var columns = 18;
 		var alphabet_EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		var alphabet_SP = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ';
 		var specialCharacters_SP = {'Á':'A', 'É':'E', 'Í':'I', 'Ó':'O', 'Ú':'U', 'Ü':'U'};
+		var outputHeight = 1500;
 
 		var footer = function(lang) {
 			var out = "";
@@ -141,7 +138,7 @@
 			}
 			for (var idx = 0;idx < input.length; idx++) {
 				var separator = ' ';
-				if (idx % 10 == 0 && idx > 0) {
+				if (idx % 8 == 0 && idx > 0) {
 					separator = '<br/>'
 				}
 				out += (idx+1) +'='+input.charAt(idx)+separator;
@@ -162,7 +159,6 @@
 			   else if (arr[idx].type === 'p') {
 				td = '<span class="punctuation">';
 			   }
-			   //tr += td + arr[idx].hold + '<br>' + arr[idx].num + '</span>&nbsp;';
                 tr += td + arr[idx].hold + arr[idx].num + '</span>';
 		   }
 		   
@@ -210,30 +206,14 @@
 				};
 
 				coded.push(decodedObj);
-				//coded[coded.length] = [k,  val];
 			}
 			var out='<div class = "container" id="outputDiv"><div class = "row align-items-start justify-content-center" id="header"><h1>'+$('#title').val()+'</h1></div><div class="row align-items-center justify-content-center" id="body">';
-			//create output for the table
-			///for (var idx = 0; idx < coded.length; idx++) {
-				//space found, find next space
-				//if (coded[idx] && (coded[idx].num === '&nbsp;' || idx === (coded.length - 1))) {
-					//nextIndexOfSpace = phrase.indexOf(' ', nextIndexOfSpace + 1);
-
-					//if next space is beyond the char max, go to new line
-					//if (nextIndexOfSpace - newLineIdx > columns || nextIndexOfSpace == -1) {
-						out += '<div class="row"><div class="col">' + createLine(coded, 0, coded.length) + '</div></div>';
-						//newLineIdx = idx + 1;
-					//}
-				//}
-			//}
-
-			//out += '<div class="row">' + createLine(coded, newLineIdx, coded.length) + '</div>';
+			out += '<div class="row"><div class="col-1"></div><div class="col">' + createLine(coded, 0, coded.length) + '</div><div class="col-1"></div>';
 			out += '</div><div id="key" class="row"><div class="col footer">'+footer(lang)+'</div></div>';
 			jQuery('#output').html(out);
 			var headerHeight = jQuery('#header').outerHeight();
 			var bodyHeight = jQuery('#body').outerHeight();
 			var keyHeight = jQuery('#key').outerHeight();
-			var outputHeight = 1300;
 			var padSize = (outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
 
 			jQuery('#key').css('padding-top', padSize);
