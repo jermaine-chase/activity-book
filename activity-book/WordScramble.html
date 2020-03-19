@@ -119,7 +119,7 @@
 					<option value="EN">English</option>
 					<option value="SP">Spanish</option>
 				</select><br>
-				<button id="generateWordScramble">Generate Word Search</button><br>
+				<button id="generateWordScramble">Generate Word Scramble</button><br>
 				<div id="unplaced"></div>
 			</td>
 			<img src=""/>
@@ -226,16 +226,27 @@
 		var scrambleWord = function(word) {
 			var returnVal = '';
 			var placed = [];
+			//loop through word and scramble
 			for (var idx = 0; idx < word.length; idx++) {
 				var k = 0;
+				//get random number from 0 to word length
 				do {
 					k = Math.floor(Math.random() * word.length);
+					//keep going until we find a letter that hasn't already been placed
 				} while (placed.length > 0 && placed.includes(k));
+				//append letter to scrambled word
 				returnVal += word[k].toUpperCase();
+				//add space after last letter
 				if (idx != word.length - 1) {
 					returnVal += '&nbsp;';
 				}
+				//add letter index for next check
 				placed.push(k);
+			}
+			//check to make sure word isn't the same as the input word
+			//if it does, recurse
+			if (word.toUpperCase() === returnVal.toUpperCase()) {
+				return scrambleWord(word);
 			}
 			return returnVal;
 		}
