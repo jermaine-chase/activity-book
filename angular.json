@@ -120,6 +120,7 @@
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "activity-book"
 }

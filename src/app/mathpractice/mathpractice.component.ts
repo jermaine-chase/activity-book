@@ -30,6 +30,7 @@ export class MathpracticeComponent implements OnInit {
 
   pp: any[]
   titleOut: string
+  instructionsOut: string
   example: string
   bodyOut: any[]
   hasWordProblems:boolean
@@ -39,12 +40,16 @@ export class MathpracticeComponent implements OnInit {
   ngOnInit() {
   }
 
-  generateActivity(title: string, ops: string, max: number, pages: number, wordProblems: string) {
+  generateActivity(title: string, instructions: string, ops: string, max: number, pages: number, wordProblems: string) {
+    if (max == 10 && pages > 3) {
+      pages = 3
+    }
     let problems;
     this.hasWordProblems = false
     this.pp = []
     let wordProbs = wordProblems.split(/[\r\n]+/)
     this.titleOut = title.toUpperCase()
+    this.instructionsOut = instructions
    
     //generate example
     let example: any
@@ -68,7 +73,7 @@ export class MathpracticeComponent implements OnInit {
       problems = []
       for (let idx = 0; idx < problemCount; idx++) {
         let p = this.generateProblemSet(ops, max, false, true)
-        if (!this.includes(problems, p)) {
+        if (!this.includesMinor(problems, p) && !this.includesMajor(p)) {
           problems.push(p)
         }
         else {
@@ -126,12 +131,25 @@ export class MathpracticeComponent implements OnInit {
     $('.soln').toggle()
   }
 
-  includes(problems: Problem[], p2: Problem) {
+  includesMinor(problems: Problem[], p2: Problem) {
     let hasProblem = false
     for (let p1 of problems) {
       if (p1.equals(p2)) {
         hasProblem = true
         break
+      }
+    }
+    return hasProblem
+  }
+
+  includesMajor(p2: Problem) {
+    let hasProblem = false
+    for (let problems of this.pp) {
+      for (let p1 of problems) {
+        if (p1.equals(p2)) {
+          hasProblem = true
+          break
+        }
       }
     }
     return hasProblem

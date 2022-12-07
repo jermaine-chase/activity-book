@@ -10,13 +10,13 @@ import * as $ from 'jquery';
 export class AppComponent {
   title = 'Activity Book';
   views = [
-         {'label': 'Math Practice', 'id': '#mathPractice'},
-          {'label': 'Blank Filler', 'id':'#blankFiller'},
-          {'label': 'Decoder', 'id':'#decoder'},
-          {'label': 'Word Scramble', 'id':'#wordScramble'},
-          {'label': 'Word Search', 'id':'#wordSearch'}
-          
-      ]
+         {label: 'Math Practice', id: '#mathPractice'},
+          {label: 'Blank Filler', id: '#blankFiller'},
+          {label: 'Decoder', id: '#decoder'},
+          {label: 'Word Scramble', id: '#wordScramble'},
+          {label: 'Word Search', id: '#wordSearch'}
+
+      ];
 
   toggleViews(event: any) {
     let toShow = event.target.hash.substring(1)

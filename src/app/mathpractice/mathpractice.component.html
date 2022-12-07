@@ -16,13 +16,14 @@
           </svg>
     </a>&nbsp;
     <button class="btn btn-primary" (click)="toggleAnswers()">Show Answers</button>&nbsp;&nbsp;
-    <button class="btn btn-primary" (click)="generateActivity(title1.value, opSel.value, maxNumber.value, pageCount.value, wordProblems.value)">Generate Activity</button><br>
+    <button class="btn btn-primary" (click)="generateActivity(title1.value, instructions1.value, opSel.value, maxNumber.value, pageCount.value, wordProblems.value)">Generate Activity</button><br>
 </div>
 <div class='container'>
     <div class='row'>
         <div id="inputDiv" class='col-4 ignore'>
-            Title:<br><input #title1/>
-            <br>Operator:<br>
+            Title:<br><input #title1/><br>
+            Instructions:<br><input #instructions1/><br>
+            Operator:<br>
             <select #opSel>
                 <option value="{{op.val}}" *ngFor="let op of operator">{{op.disp}}</option>
             </select>
@@ -40,7 +41,7 @@
         <div id="outputDiv" class='col-8'>
             <div id="output" class="container printpage" *ngFor="let problems of pp">
                 <div id ="header" class="myPad">
-                    <h3>{{titleOut}}</h3>
+                    <h3>{{titleOut}}</h3><br>{{instructionsOut}}
                 </div>
                 <div id = "body" class = "row">
                     <ng-template ngFor let-problem [ngForOf]="problems" let-i="index">
