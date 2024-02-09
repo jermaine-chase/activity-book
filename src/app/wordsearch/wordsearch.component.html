@@ -1,0 +1,132 @@
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: initial;
+  }
+  span {
+    text-align: center;
+    display: inline-block;
+    font-size: 40px;
+    border-top: black 5px;
+    margin-right: 10px;
+    width: 45px;
+  }
+  h1 {
+    font-size: 64px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    padding-bottom: 25px;
+  }
+  div {
+    text-align: center;
+  }
+  .border {
+    border: 1px solid black;
+    width: 744px;
+  }
+  .footer {
+    font-size: 30px;
+    margin-top: 25px;
+    width: 690px;
+    text-align: center;
+  }
+  .decode {
+    text-align: center;
+    position: relative;
+    margin-top: 35px;
+  }
+  .decode:before {
+    display: block;
+    border-bottom: 1px solid black;
+    content: " ";
+  }
+
+  .word {
+    display: inline-block;
+    margin: 0 20px 50px 0;
+    height: 75px;
+    position: relative;
+  }
+
+  #body {
+    font-size: 25px;
+  }
+  .numbers {
+    font-size: 24px;
+  }
+  .punctuation {
+    width: 12px !important;
+    text-align: left;
+    top: -57px;
+    position: relative;
+  }
+  .noPad {
+    padding: 0px;
+  }
+</style>
+<div><h1 class="ignore">Word Search</h1></div>
+<div class="ignore">
+  <button class="btn btn-primary" (click)="doWork()">Generate Activity</button><br>
+</div>
+<div class='container'>
+  <div class='row'>
+    <div class='col-6 ignore'>
+      Title:<br><input #title/>
+      Width: <input class="inputDim" #puzzleWidth value="15"/><br>
+      Height: <input class="inputDim" #puzzleHeight value="15"/><br>
+      <span style="font-size: 10px;">Allow Backwards Words?:</span><br>
+      <select #puzzleReverse>
+        <option value="0.5">TRUE</option>
+        <option value="0">FALSE</option>
+      </select><br>
+      <span style="font-size: 10px;">Allow Diagonal Words?:</span><br>
+      <select #puzzleDiagonal>
+        <option value="true">TRUE</option>
+        <option value="false">FALSE</option>
+      </select>
+      <br><br>
+      Word List (comma separated):<br><textarea #wordListIn></textarea><br><br>
+      <select id="pagePadSelector">
+        <option value="Right">Right Page</option>
+        <option value="Left">Left Page</option>
+      </select><br><br>Language:<br>
+      <select #langSel>
+        <option value="EN">English</option>
+        <option value="SP">Spanish</option>
+      </select>
+      <br>
+    </div>
+    <div class='col-6'>
+      <div id="output" class="container">
+        <div id ="header">
+          <h1 class="outTitle">{{titleOut}}</h1>
+        </div>
+        <div id = "body" class="container">
+          <div class = "row">
+            <div class="col-1"></div>
+            <div class="col">
+              <div class="word" *ngFor="let term of bodyOut">
+                                <span *ngFor="let letter of term" [ngClass]="{'decode': letter.type === 'c',
+                                'punctuation': letter.type === 'p'}">{{letter.hold}}{{letter.num}}</span>
+              </div>
+            </div>
+            <div class="col-1"></div>
+          </div>
+        </div>
+        <div id = "key" class="container">
+          <div class="row">
+            <div class="col-12">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 valignBottom rotate text-left">
+              {{footerOut}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

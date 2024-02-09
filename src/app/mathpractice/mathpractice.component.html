@@ -1,0 +1,86 @@
+<style>
+
+</style>
+<div><h1 class="ignore">Math Practice</h1></div>
+<div class="ignore">
+    <a href="#" (click)="toggleInput()">
+        <svg id="showInput" class="bi bi-box-arrow-in-right invisible" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M8.146 11.354a.5.5 0 010-.708L10.793 8 8.146 5.354a.5.5 0 11.708-.708l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9A.5.5 0 011 8z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M13.5 14.5A1.5 1.5 0 0015 13V3a1.5 1.5 0 00-1.5-1.5h-8A1.5 1.5 0 004 3v1.5a.5.5 0 001 0V3a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v10a.5.5 0 01-.5.5h-8A.5.5 0 015 13v-1.5a.5.5 0 00-1 0V13a1.5 1.5 0 001.5 1.5h8z" clip-rule="evenodd"/>
+        </svg>
+        <svg id="hideInput" class="bi bi-box-arrow-in-left" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M7.854 11.354a.5.5 0 000-.708L5.207 8l2.647-2.646a.5.5 0 10-.708-.708l-3 3a.5.5 0 000 .708l3 3a.5.5 0 00.708 0z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 00-.5-.5h-9a.5.5 0 000 1h9A.5.5 0 0015 8z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M2.5 14.5A1.5 1.5 0 011 13V3a1.5 1.5 0 011.5-1.5h8A1.5 1.5 0 0112 3v1.5a.5.5 0 01-1 0V3a.5.5 0 00-.5-.5h-8A.5.5 0 002 3v10a.5.5 0 00.5.5h8a.5.5 0 00.5-.5v-1.5a.5.5 0 011 0V13a1.5 1.5 0 01-1.5 1.5h-8z" clip-rule="evenodd"/>
+          </svg>
+    </a>&nbsp;
+    <button class="btn btn-primary" (click)="toggleAnswers()">Show Answers</button>&nbsp;&nbsp;
+    <button class="btn btn-primary" (click)="generateActivity(title1.value, instructions1.value, opSel.value, maxNumber.value, pageCount.value, wordProblems.value)">Generate Activity</button><br>
+</div>
+<div class='container'>
+    <div class='row'>
+        <div id="inputDiv" class='col-4 ignore'>
+            Title:<br><input #title1/><br>
+            Instructions:<br><input #instructions1/><br>
+            Operator:<br>
+            <select #opSel>
+                <option value="{{op.val}}" *ngFor="let op of operator">{{op.disp}}</option>
+            </select>
+            <br>Digit Count:<br>
+            <select #maxNumber>
+                <option value="{{digit.val}}" *ngFor="let digit of digits">{{digit.disp}}</option>
+            </select>
+            <br>Page Count:<br>
+            <select #pageCount>
+                <option value="{{pg.val}}" *ngFor="let pg of pages">{{pg.disp}}</option>
+            </select>
+            <br>
+            Word Problems:<br><textarea #wordProblems placeholder="Place a line between each problem"></textarea>
+        </div>
+        <div id="outputDiv" class='col-8'>
+            <div id="output" class="container printpage" *ngFor="let problems of pp">
+                <div id ="header" class="myPad">
+                    <h3>{{titleOut}}</h3><br>{{instructionsOut}}
+                </div>
+                <div id = "body" class = "row">
+                    <ng-template ngFor let-problem [ngForOf]="problems" let-i="index">
+                        <div *ngIf="problem.text; then word else math"></div>
+                        <ng-template #math>
+                            <div class="col-1 align-top text-right">{{i + 1}}.)</div>
+                            <div class="col-3" [class.problem]="!hasWordProblems" [class.wordproblem]="hasWordProblems" [class.text-right]="problem.operator !== '÷'" [ngSwitch]="problem.operator">
+                                <ng-template [ngSwitchCase]="'x'">
+                                    <span>{{problem.operand1}}</span><span class="forceWidth"></span><br>
+                                    <span class="bottom">{{problem.operator}} {{problem.operand2}}</span><span class="forceWidth"></span><br>
+                                    <span class="space"> </span>
+                                    <span class="soln" style="display: none;">{{problem.soln.answer}}</span><span class="forceWidth"></span>
+                                </ng-template>
+                                <ng-template [ngSwitchCase]="'+'">
+                                    <span>{{problem.operand1}}</span><span class="forceWidth"></span><br>
+                                    <span class="bottom">{{problem.operator}} {{problem.operand2}}</span><span class="forceWidth"></span><br>
+                                    <span class="space"> </span>
+                                    <span class="soln" style="display: none;">{{problem.soln.answer}}</span><span class="forceWidth"></span>
+                                </ng-template>
+                                <ng-template [ngSwitchCase]="'÷'">
+                                    <span class="forceWidth"></span>
+                                    <span class="soln forceWidth text-right" style="display: none;">{{problem.soln.answer}}</span>
+                                    <span *ngIf="!problem.soln.showRemainder" class="forceWidth"></span>
+                                    <span *ngIf="problem.soln.showRemainder" class="soln forceWidth text-right" style="display: none;"> R {{problem.soln.remain}}</span><br>
+
+                                    <span class="divisor forceWidth text-right">{{problem.operand2}}</span>
+                                    <span class="dividend forceWidth text-right">{{problem.operand1}}</span>
+                                    <span class="forceWidth"></span>
+                                    <br>
+                                </ng-template>
+                            </div>
+                        </ng-template>
+                        <ng-template #word>
+                            <div class="col-1 align-top">{{i + 1}}.)</div>
+                            <div class="col-11 text-left wordproblem">{{problem.text}} <span class="soln" style="display: none;">{{problem.soln.textAnswer}}</span></div>
+                        </ng-template>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
