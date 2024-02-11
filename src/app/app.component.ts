@@ -9,11 +9,11 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'Activity Book';
   views = [
-         {label: 'Math Practice', id: 'mathPractice', show: false},
-          {label: 'Blank Filler', id: 'blankFiller', show: false},
-          {label: 'Decoder', id: 'decoder', show: false},
-          {label: 'Word Scramble', id: 'wordScramble', show: false},
-          {label: 'Word Search', id: 'wordSearch', show: false}
+         {label: 'Math Practice', id: '#mathPractice', show: false},
+          {label: 'Blank Filler', id: '#blankFiller', show: false},
+          {label: 'Decoder', id: '#decoder', show: false},
+          {label: 'Word Scramble', id: '#wordScramble', show: false},
+          {label: 'Word Search', id: '#wordSearch', show: false}
 
       ]
 
