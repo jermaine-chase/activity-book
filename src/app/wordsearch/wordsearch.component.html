@@ -3,6 +3,10 @@
     font-family: Arial, Helvetica, sans-serif;
     font-size: initial;
   }
+  td {
+    height: 40px;
+    width: 40px;
+  }
   span {
     text-align: center;
     display: inline-block;
@@ -68,14 +72,30 @@
 </style>
 <div><h1 class="ignore">Word Search</h1></div>
 <div class="ignore">
-  <button class="btn btn-primary" (click)="doWork()">Generate Activity</button><br>
+  <a (click)="toggleInput()">
+    <svg *ngIf='!showInput' id="showInput" class="bi bi-box-arrow-in-right invisible" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M8.146 11.354a.5.5 0 010-.708L10.793 8 8.146 5.354a.5.5 0 11.708-.708l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0z" clip-rule="evenodd"/>
+      <path fill-rule="evenodd" d="M1 8a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9A.5.5 0 011 8z" clip-rule="evenodd"/>
+      <path fill-rule="evenodd" d="M13.5 14.5A1.5 1.5 0 0015 13V3a1.5 1.5 0 00-1.5-1.5h-8A1.5 1.5 0 004 3v1.5a.5.5 0 001 0V3a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v10a.5.5 0 01-.5.5h-8A.5.5 0 015 13v-1.5a.5.5 0 00-1 0V13a1.5 1.5 0 001.5 1.5h8z" clip-rule="evenodd"/>
+    </svg>
+    <svg *ngIf='showInput' id="hideInput" class="bi bi-box-arrow-in-left" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M7.854 11.354a.5.5 0 000-.708L5.207 8l2.647-2.646a.5.5 0 10-.708-.708l-3 3a.5.5 0 000 .708l3 3a.5.5 0 00.708 0z" clip-rule="evenodd"/>
+      <path fill-rule="evenodd" d="M15 8a.5.5 0 00-.5-.5h-9a.5.5 0 000 1h9A.5.5 0 0015 8z" clip-rule="evenodd"/>
+      <path fill-rule="evenodd" d="M2.5 14.5A1.5 1.5 0 011 13V3a1.5 1.5 0 011.5-1.5h8A1.5 1.5 0 0112 3v1.5a.5.5 0 01-1 0V3a.5.5 0 00-.5-.5h-8A.5.5 0 002 3v10a.5.5 0 00.5.5h8a.5.5 0 00.5-.5v-1.5a.5.5 0 011 0V13a1.5 1.5 0 01-1.5 1.5h-8z" clip-rule="evenodd"/>
+    </svg>
+  </a>&nbsp;
+  <button class="btn btn-primary" (click)="toggleAnswers()">Show Answers</button>&nbsp;&nbsp;
+  <button class="btn btn-primary"
+          (click)="generateActivity(title.value, wordListIn.value, puzzleWidth.value, puzzleHeight.value, langSel.value, puzzleReverse.value, puzzleDiagonal.value)">
+    Generate Activity</button>&nbsp;&nbsp;
+  <button class="btn btn-primary" (click)="print()">Print</button><br>
 </div>
 <div class='container'>
   <div class='row'>
     <div class='col-6 ignore'>
-      Title:<br><input #title/>
-      Width: <input class="inputDim" #puzzleWidth value="15"/><br>
-      Height: <input class="inputDim" #puzzleHeight value="15"/><br>
+      Title:<br><input #title value="The Spice"/><br>
+      Width:<br><input class="inputDim" #puzzleWidth value="15"/><br>
+      Height:<br><input class="inputDim" #puzzleHeight value="15"/><br>
       <span style="font-size: 10px;">Allow Backwards Words?:</span><br>
       <select #puzzleReverse>
         <option value="0.5">TRUE</option>
@@ -87,7 +107,7 @@
         <option value="false">FALSE</option>
       </select>
       <br><br>
-      Word List (comma separated):<br><textarea #wordListIn></textarea><br><br>
+      Word List (comma separated):<br><textarea #wordListIn>Worm, Spice, Dune, Arakkis, Fremen, Guild, Houses, Atreides, Harkonnen</textarea><br><br>
       <select id="pagePadSelector">
         <option value="Right">Right Page</option>
         <option value="Left">Left Page</option>
@@ -107,10 +127,16 @@
           <div class = "row">
             <div class="col-1"></div>
             <div class="col">
-              <div class="word" *ngFor="let term of bodyOut">
-                                <span *ngFor="let letter of term" [ngClass]="{'decode': letter.type === 'c',
-                                'punctuation': letter.type === 'p'}">{{letter.hold}}{{letter.num}}</span>
-              </div>
+              <table *ngIf="!showAnswers">
+                <tr *ngFor="let line of bodyOut?.grid">
+                  <td *ngFor="let letter of line">{{letter}}</td>
+                </tr>
+              </table>
+              <table *ngIf="showAnswers">
+                <tr *ngFor="let line of bodyOut?.solved; index as i">
+                  <td *ngFor="let letter of line; index as j">{{letter.trim() !== ''? letter.toUpperCase(): bodyOut.grid[i][j]}}</td>
+                </tr>
+              </table>
             </div>
             <div class="col-1"></div>
           </div>
@@ -122,7 +148,7 @@
           </div>
           <div class="row">
             <div class="col-12 valignBottom rotate text-left">
-              {{footerOut}}
+              <strong *ngFor="let f of footerOut">{{f}}</strong>
             </div>
           </div>
         </div>

@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import {NgClass, NgFor, NgIf} from "@angular/common";
+import { Component } from '@angular/core';
 import {PrintService} from "../shared/print.service";
+import {NgClass, NgIf} from "@angular/common";
 
 @Component({
-  selector: 'blankfiller',
-  templateUrl: './blankfiller.component.html',
+  selector: 'app-wordpractice',
   standalone: true,
-  imports: [NgClass, NgFor, NgClass, NgIf],
-  styleUrls: ['./blankfiller.component.css']
+  imports: [
+    NgClass,
+    NgIf
+  ],
+  templateUrl: './wordpractice.component.html',
+  styleUrl: './wordpractice.component.css'
 })
-export class BlankfillerComponent implements OnInit {
+export class WordpracticeComponent {
 
   constructor(private printService: PrintService) { }
 
@@ -18,6 +21,8 @@ export class BlankfillerComponent implements OnInit {
   titleOut = ''
   bodyOut = ''
   footerOut = ''
+  outputHeight = 1100
+  padding = 250
 
   ngOnInit() {
   }
@@ -44,7 +49,9 @@ export class BlankfillerComponent implements OnInit {
         response += word
       }
       else {
-        response += this.makeDashes(word.substring(1), false)
+        for (let i = 0; i < 3; i++) {
+          response += this.makeDashes(word.substring(1), false) + '\n'
+        }
       }
       response += ' '
     }
@@ -122,10 +129,5 @@ export class BlankfillerComponent implements OnInit {
   print() {
     const bodyIn = this.bodyOut.replaceAll('. ', '. |')
     this.printService.printByLine(this.titleOut, bodyIn.split('|'), [this.footerOut], 'blank-filler.pdf')
-  }
-
-  test() {
-    this.printService.testPrintByLine()
-    this.printService.testPrintTable()
   }
 }

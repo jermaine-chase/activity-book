@@ -1,15 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import $ from 'jquery';
+import {NgClass, NgFor, NgIf} from "@angular/common";
+import {PrintService} from "../shared/print.service";
 
 @Component({
   selector: 'decoder',
+  standalone: true,
+  imports: [NgClass, NgFor, NgClass, NgIf],
   templateUrl: './decoder.component.html',
   styleUrls: ['./decoder.component.css']
 })
 export class DecoderComponent implements OnInit {
 
+  showInput = true
+  showAnswers = true
   titleOut = ''
-  bodyOut: any[] | undefined
+  bodyOut: any[] = []
   footerOut = ''
   alphabet_EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   alphabet_SP = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'
@@ -17,7 +22,7 @@ export class DecoderComponent implements OnInit {
   outputHeight = 1100;
   padding = 466;
 
-  constructor() { }
+  constructor(private printService: PrintService) { }
 
   ngOnInit() {
   }
@@ -35,7 +40,7 @@ export class DecoderComponent implements OnInit {
       let separator = ' ';
       length += (idx + 1 + '').length + 3;
       if (length >= 40) {
-        separator = '<br/>';
+        separator = '\n';
         length = 0;
       }
       out += (idx + 1) + '=' + input.charAt(idx) + separator;
@@ -86,20 +91,54 @@ export class DecoderComponent implements OnInit {
       codedWord.push(decodedObj);
     }
     codedPhrase.push(codedWord);
-    // let out=''
-    // out += this.createLine(coded, 0, coded.length)
     this.bodyOut = codedPhrase;
     this.footerOut = this.footer(lang);
-    // $('#output').html(out)
 
-    const headerHeight = $('#header').outerHeight();
-    const bodyHeight = $('#body').outerHeight();
-    const keyHeight = $('#key').outerHeight();
-    // @ts-ignore
-    const padSize = (this.outputHeight - (headerHeight + bodyHeight + keyHeight)) / 2;
-
-    $('#key').css('padding-top', padSize);
-    $('#body').css('padding-top', padSize);
     return;
+  }
+
+  toggleInput() {
+    this.showInput = !this.showInput
+  }
+
+  toggleAnswers() {
+    this.showAnswers = !this.showAnswers
+  }
+
+  print() {
+    // generate lines for the printout
+    let newBody = []
+    const lineWidth = 40
+    let chars = ''
+    let nums = ''
+    for (let line of this.bodyOut) {
+      if (chars.length + line.length > lineWidth ) {
+        newBody.push(chars)
+        newBody.push(nums)
+        chars = ''
+        nums = ''
+      }
+
+      for (let c of line) {
+        if (c.type === 'c') {
+          chars += ' __'
+          if (c.num < 10) {
+            nums += '   ' + c.num
+          } else {
+            nums += ' ' + c.num
+          }
+        } else {
+          if (c.hold !== '\n') {
+            chars += c.hold
+          } else {
+            chars += '  '
+          }
+          nums += '  '
+        }
+      }
+      chars += '  '
+      nums += '  '
+    }
+    this.printService.printByLine(this.titleOut, newBody, [this.footerOut], 'decoder.pdf')
   }
 }

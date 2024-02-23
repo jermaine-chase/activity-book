@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WordscrambleComponent } from './wordscramble.component';
 
@@ -6,14 +6,12 @@ describe('WordscrambleComponent', () => {
   let component: WordscrambleComponent;
   let fixture: ComponentFixture<WordscrambleComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ WordscrambleComponent ]
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [WordscrambleComponent]
     })
     .compileComponents();
-  }));
-
-  beforeEach(() => {
+    
     fixture = TestBed.createComponent(WordscrambleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

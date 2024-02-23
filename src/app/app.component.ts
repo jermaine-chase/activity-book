@@ -1,21 +1,24 @@
 import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import {JsonPipe, NgFor, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, NgFor, NgIf, JsonPipe],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrl: './app.component.css'
 })
-
 export class AppComponent {
   title = 'Activity Book';
   views = [
-         {label: 'Math Practice', id: '#mathPractice', show: false},
-          {label: 'Blank Filler', id: '#blankFiller', show: false},
-          {label: 'Decoder', id: '#decoder', show: false},
-          {label: 'Word Scramble', id: '#wordScramble', show: false},
-          {label: 'Word Search', id: '#wordSearch', show: false}
-
-      ]
+    {label: 'Blank Filler', id: '#blankFiller', name: 'blank-fill', show: false},
+    {label: 'Decoder', id: '#decoder', name: 'decode', show: false},
+    {label: 'Math Practice', id: '#mathPractice', name: 'math-practice', show: false},
+    {label: 'Word Practice', id: '#wordPractice', name: 'word-practice', show: false},
+    {label: 'Word Scramble', id: '#wordScramble', name: 'word-scramble', show: false},
+    {label: 'Word Search', id: '#wordSearch', name: 'word-search', show: false}
+  ]
 
   toggleViews(divName: string) {
     for (const v of this.views) {
@@ -26,14 +29,4 @@ export class AppComponent {
       }
     }
   }
-
-  getDivStatus(divName: string) {
-    for (const v of this.views) {
-      if (v.id.includes(divName)) {
-        return v.show
-      }
-    }
-    return false;
-  }
-
 }

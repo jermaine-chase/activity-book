@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import $ from 'jquery';
-import { Problem } from './problem';
+import {Problem} from './problem';
+import {NgFor, NgForOf, NgIf, NgSwitch, NgSwitchCase} from "@angular/common";
 
 @Component({
   selector: 'mathpractice',
+  standalone: true,
+  imports: [NgSwitch, NgFor, NgForOf, NgSwitchCase, NgIf],
   templateUrl: './mathpractice.component.html',
   styleUrls: ['./mathpractice.component.css']
 })
@@ -33,7 +36,8 @@ export class MathpracticeComponent implements OnInit {
   instructionsOut: string | undefined
   hasWordProblems: boolean | undefined
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }
@@ -59,9 +63,8 @@ export class MathpracticeComponent implements OnInit {
       let wordProblemLengths = 0
       if (wordProbs.length <= 1) {
         wordProblemLengths = 0
-      }
-      else {
-        wordProblemLengths = wordProbs.length >= 2?3:wordProbs.length
+      } else {
+        wordProblemLengths = wordProbs.length >= 2 ? 3 : wordProbs.length
         this.hasWordProblems = true
       }
       let problemCount = 15
@@ -73,24 +76,23 @@ export class MathpracticeComponent implements OnInit {
         let p = this.generateProblemSet(ops, max, false, true)
         if (!this.includesMinor(problems, p) && !this.includesMajor(p)) {
           problems.push(p)
-        }
-        else {
+        } else {
           //do the loop again.
           idx--
         }
 
       }
-      for (let idx = i * 2; (idx < (i+1)* 2 && idx < wordProblemLengths); idx++ ) {
+      for (let idx = i * 2; (idx < (i + 1) * 2 && idx < wordProblemLengths); idx++) {
         let p = new Problem(0, 0, '')
-        p.text = wordProbs[idx].split('?')[0]+'?'
+        p.text = wordProbs[idx].split('?')[0] + '?'
         p.soln.textAnswer = wordProbs[idx].split('?')[1]
         problems.push(p)
       }
       this.pp.push(problems)
     }
     if (!this.hidden) {
-          this.toggleInput()
-          this.hidden = true;
+      this.toggleInput()
+      this.hidden = true;
     }
   }
 
@@ -104,8 +106,7 @@ export class MathpracticeComponent implements OnInit {
       $('#showInput').addClass('visible')
       $('#hideInput').addClass('invisible')
       this.hidden = true;
-    }
-    else {
+    } else {
       $('#inputDiv').removeClass('collapse')
       $('#outputDiv').removeClass('col')
       $('#outputDiv').addClass('col-8')
